@@ -130,9 +130,9 @@ export default function WishlistPage() {
                   {/* MEDIA */}
                   <div className="relative w-full h-36 bg-gray-100 overflow-hidden">
 
-                    {listing.image_urls?.length > 0 ? (
+                    {(listing.image_urls?.length ?? 0) > 0 ? (
                       <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${listing.image_urls[0]}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${listing.image_urls?.[0]}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                       />
                     ) : listing.video_url ? (
