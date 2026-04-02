@@ -5,32 +5,7 @@ import { useEffect, useState } from "react";
 
 import ListingCard from "@/components/marketplace/ListingCard";
 import { fetchPublic } from "@/lib/api";
-
-interface Merchant {
-  id: number;
-  business_name: string;
-}
-
-interface SubCategory {
-  id: number;
-  name: string;
-  category_id: number;
-}
-
-interface Listing {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  currency: string;
-  listing_type: "product" | "service";
-
-  image_urls?: string[];
-  video_url?: string;
-
-  merchant?: Merchant;
-  subcategory?: SubCategory;
-}
+import { Listing } from "@/types/listing";
 
 export default function SearchPage() {
 
@@ -56,10 +31,9 @@ export default function SearchPage() {
       const data = await fetchPublic(
         `/sandy/discovery?query=${encodeURIComponent(query)}`,
         {},
-        false
       );
 
-      setResults(Array.isArray(data) ? data : []);
+      setResults((Array.isArray(data) ? data : []) as Listing[]);
 
     } catch (err) {
       console.error("Search error", err);
