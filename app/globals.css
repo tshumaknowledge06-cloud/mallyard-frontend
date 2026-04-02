@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------
+   THE MALLYARD DESIGN SYSTEM
+------------------------------------------------ */
+
+/* Root Design Tokens */
+:root {
+
+  /* Core */
+  --background: #F9FAFB;
+  --foreground: #111827;
+
+  /* Brand */
+  --emerald-main: #064E3B;
+  --emerald-soft: #0F766E;
+  --emerald-dark: #022C22;
+
+  --gold-soft: #C9A227;
+
+  /* UI */
+  --border-color: #E5E7EB;
+  --card-bg: #FFFFFF;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+}
+
+/* Tailwind v4 Theme Bridge */
+@theme inline {
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-emerald: var(--emerald-main);
+  --color-emerald-soft: var(--emerald-soft);
+  --color-emerald-dark: var(--emerald-dark);
+
+  --color-gold: var(--gold-soft);
+
+  --color-border: var(--border-color);
+  --color-card: var(--card-bg);
+
+  --font-sans: Inter, system-ui, -apple-system, sans-serif;
+
+}
+
+/* -------------------------------
+   Dark Mode
+-------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+
+  :root {
+
+    --background: #0A0A0A;
+    --foreground: #EDEDED;
+
+    --card-bg: #111111;
+    --border-color: #262626;
+
+  }
+
+}
+
+/* -------------------------------
+   Base Layer
+-------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* -------------------------------
+   Reusable Utility Classes
+-------------------------------- */
+
+.container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  padding-left: 16px;
+  padding-right: 16px;
+
+  box-sizing: border-box;
+}
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: var(--emerald-main);
+  color: white;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--emerald-soft);
+}
+
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+/* 🔥 REMOVE SCROLLBAR COMPLETELY */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+html, body {
+  overflow-x: hidden;
+}

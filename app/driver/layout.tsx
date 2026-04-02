@@ -1,0 +1,104 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+
+export default function DriverLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+
+  const pathname = usePathname();
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const links = [
+    { href: "/driver/dashboard", label: "Dashboard" },
+    { href: "/driver/assigned", label: "Assigned Deliveries" },
+    { href: "/driver/history", label: "Delivery History" },
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+
+      {/* 🔥 MOBILE MENU BUTTON */}
+      <button
+        onClick={() => setShowSidebar(true)}
+        className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md rounded-full p-2"
+      >
+        ☰
+      </button>
+
+      {/* 🔥 SIDEBAR */}
+      <aside
+        className={`
+          fixed md:relative
+          top-0 left-0 h-full md:h-auto
+          w-64 bg-white border-r z-50
+          transform transition-transform duration-300
+          ${showSidebar ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+        `}
+      >
+
+        {/* 🔥 CLOSE BUTTON (MOBILE) */}
+        <div className="md:hidden flex justify-end p-4">
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="text-gray-500"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* HEADER */}
+        <div className="p-6 border-b">
+          <h2 className="font-semibold text-lg text-emerald-700">
+            Driver Panel
+          </h2>
+        </div>
+
+        {/* NAV */}
+        <nav className="p-4 space-y-2">
+
+          {links.map((link) => {
+
+            const active = pathname.startsWith(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setShowSidebar(false)}
+                className={`block px-4 py-2 rounded-md transition ${
+                  active
+                    ? "bg-emerald-600 text-white font-medium"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+        </nav>
+
+      </aside>
+
+      {/* 🔥 BACKDROP */}
+      {showSidebar && (
+        <div
+          onClick={() => setShowSidebar(false)}
+          className="fixed inset-0 bg-black/30 z-40 md:hidden"
+        />
+      )}
+
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
+        {children}
+      </main>
+
+    </div>
+  );
+}
