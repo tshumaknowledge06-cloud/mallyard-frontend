@@ -123,7 +123,7 @@ useEffect(() => {
 
   const fetchTrending = async () => {
     try {
-      const data = await fetchPublic("/trending/", {}, false);
+      const data = await fetchPublic("/trending/");
       setTrending((data || []).map(normalizeListing));
     } catch {
       setTrending([]);
@@ -158,7 +158,7 @@ useEffect(() => {
         url += `?location=${encodeURIComponent(storedLocation)}`;
       }
 
-      const data = await fetchPublic(url, {}, false);
+      const data = await fetchPublic(url, {},);
 
       setListings((data || []).map(normalizeListing));
 
@@ -171,7 +171,7 @@ useEffect(() => {
 
   const fetchCategories = async () => {
     try {
-      const data = await fetchPublic("/categories/", {}, false);
+      const data = await fetchPublic("/categories/");
       setCategories(data);
     } catch {
       setCategories([]);
