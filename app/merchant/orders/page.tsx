@@ -129,7 +129,7 @@ export default function MerchantOrders() {
     try {
       if (!o.listing_id) return;
 
-      const data = await fetchWithAuth(`/listings/${o.listing_id}`, {}, false);
+      const data = await fetchWithAuth(`/listings/${o.listing_id}`);
       listings[o.listing_id] = data;
     } catch {}
   })
