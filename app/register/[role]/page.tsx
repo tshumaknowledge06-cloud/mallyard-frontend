@@ -66,7 +66,7 @@ const [contactPhone, setContactPhone] = useState("");
           full_name: fullName,
           role
         })
-      }, false);
+      });
 
       if (!data) {
         alert("Registration failed");
@@ -113,7 +113,7 @@ const [contactPhone, setContactPhone] = useState("");
           license_number: licenseNumber,
           operating_city: operatingCity
         })
-      }, false);
+      });
 
       if (!data) {
         alert("Submission failed");
@@ -155,7 +155,7 @@ const [contactPhone, setContactPhone] = useState("");
         contact_phone: contactPhone,
         payment_methods: [],
       }),
-    }, false);
+    });
 
     if (!data) {
       alert("Merchant registration failed");
