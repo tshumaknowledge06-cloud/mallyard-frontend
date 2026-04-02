@@ -3,11 +3,12 @@
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import { useState, useRef, useMemo, useEffect } from "react";
+import { Listing } from "@/types/listing";
 
 interface Merchant {
   id: number;
   business_name: string;
-  location: string;
+  location?: string;
   merchant_type: string;
 }
 
@@ -15,21 +16,6 @@ interface SubCategory {
   id: number;
   name: string;
   category_id: number;
-}
-
-interface Listing {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  currency: string;
-  listing_type: "product" | "service";
-
-  image_urls?: string[];
-  video_url?: string;
-
-  merchant: Merchant;
-  subcategory: SubCategory;
 }
 
 interface Props {
