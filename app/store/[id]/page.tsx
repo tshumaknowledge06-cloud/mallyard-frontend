@@ -83,7 +83,9 @@ export default function MerchantStorefrontPage() {
   if (error) return <ErrorState message={error} />;
 
   if (!merchant) {
-    return <EmptyState title="Merchant not found" />;
+    return <EmptyState 
+             title="Merchant not found"
+             message="This store does not exist or may have been removed" />;
   }
 
   return (
@@ -157,7 +159,9 @@ export default function MerchantStorefrontPage() {
         </h2>
 
         {listings.length === 0 ? (
-          <EmptyState title="This merchant has no listings yet." />
+          <EmptyState 
+            title="This merchant has no listings yet."
+            message="The Logo is not uploaded " />
         ) : (
 
           <div
