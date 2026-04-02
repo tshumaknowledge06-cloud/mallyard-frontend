@@ -60,7 +60,6 @@ export default function MerchantLayout({
         {/* 🔥 CLOSE BUTTON (MOBILE) */}
         <button
           onClick={() => setShowSidebar(false)}
-          onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
           className="md:hidden mb-4 text-gray-500"
         >
           ✕ Close
@@ -77,7 +76,6 @@ export default function MerchantLayout({
               href={link.href}
               className={linkClass(link.href)}
               onClick={() => setShowSidebar(false)}
-              onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
             >
               {link.label}
             </Link>
@@ -90,13 +88,15 @@ export default function MerchantLayout({
       {showSidebar && (
         <div
           onClick={() => setShowSidebar(false)}
-          onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
         />
       )}
 
-      {/* 🔥 MAIN */}
-      <main className="flex-1 p-4 md:p-8 w-full">
+      {/* 🔥 MAIN - Click outside to close sidebar on mobile */}
+      <main
+        className="flex-1 p-4 md:p-8 w-full"
+        onClick={() => showSidebar && setShowSidebar(false)}
+      >
         {children}
       </main>
 

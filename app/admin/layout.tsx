@@ -26,49 +26,58 @@ export default function AdminLayout({
     }
   }, [router, isLoginPage]);
 
+  // 🔥 AUTO CLOSE ON ROUTE CHANGE
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
   if (isLoginPage) {
     return <>{children}</>;
   }
 
   return (
-  <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100">
 
-    {/* 🔥 MOBILE MENU BUTTON */}
-    {!sidebarOpen && (
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-40 bg-white shadow-md rounded-full p-2 text-xl"
-      >
-        ☰
-      </button>
-    )}
+      {/* 🔥 MOBILE MENU BUTTON */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="md:hidden fixed top-4 left-4 z-40 bg-white shadow-md rounded-full p-2 text-xl"
+        >
+          ☰
+        </button>
+      )}
 
-    {/* 🔥 SIDEBAR */}
-    <div
-      className={`
-        fixed md:relative
-        top-0 left-0 h-full md:h-auto
-        w-64 bg-white shadow-md z-50
-        transform transition-transform duration-300
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        md:translate-x-0
-      `}
-    >
-      <AdminSidebar closeSidebar={() => setSidebarOpen(false)} />
-    </div>
-
-    {/* 🔥 BACKDROP */}
-    {sidebarOpen && (
+      {/* 🔥 SIDEBAR */}
       <div
-        onClick={() => setSidebarOpen(false)}
-        className="fixed inset-0 bg-black/30 z-40 md:hidden"
-      />
-    )}
+        className={`
+          fixed md:relative
+          top-0 left-0 h-full md:h-auto
+          w-64 bg-white shadow-md z-50
+          transform transition-transform duration-300
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+        `}
+      >
+        <AdminSidebar closeSidebar={() => setSidebarOpen(false)} />
+      </div>
 
-    {/* 🔥 MAIN CONTENT */}
-    <main className="flex-1 p-4 md:p-8 w-full">
-      {children}
-    </main>
-  </div>
-);
+      {/* 🔥 BACKDROP */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/30 z-40 md:hidden"
+        />
+      )}
+
+      {/* 🔥 MAIN CONTENT - Click outside to close sidebar on mobile */}
+      <main
+        className="flex-1 p-4 md:p-8 w-full"
+        onClick={() => sidebarOpen && setSidebarOpen(false)}
+      >
+        {children}
+      </main>
+
+    </div>
+  );
 }

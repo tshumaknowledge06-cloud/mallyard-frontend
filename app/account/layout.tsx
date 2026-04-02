@@ -17,9 +17,9 @@ export default function AccountLayout({
   }, [pathname]);
 
   return (
-    <div className="flex max-w-7xl mx-auto gap-8">
+    <div className="flex max-w-7xl mx-auto gap-8 relative">
 
-      {/* 🔥 MOBILE BUTTON */}
+      {/* 🔥 MOBILE MENU BUTTON - ONLY VISIBLE ON MOBILE */}
       <button
         onClick={() => setShowSidebar(true)}
         className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md rounded-full p-2"
@@ -27,22 +27,18 @@ export default function AccountLayout({
         ☰
       </button>
 
-      {/* 🔥 SIDEBAR */}
+      {/* 🔥 MOBILE SIDEBAR (OVERLAY) - ONLY SHOWS ON MOBILE WHEN TOGGLED */}
       <aside
         className={`
-          fixed md:relative
-          top-0 left-0 h-full md:h-fit
-          w-64 bg-white p-6 shadow z-50
+          md:hidden
+          fixed top-0 left-0 h-full w-64 bg-white p-6 shadow z-50
           transform transition-transform duration-300
           ${showSidebar ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
         `}
       >
-        {/* CLOSE */}
         <button
           onClick={() => setShowSidebar(false)}
-          onTouchStart={() => setShowSidebar(false)}
-          className="md:hidden mb-4"
+          className="mb-4 text-gray-500"
         >
           ✕ Close
         </button>
@@ -51,21 +47,25 @@ export default function AccountLayout({
           Account
         </h2>
 
-        {/* NOTE: Tabs stay in page (state logic stays there) */}
-        {children && null}
+        {/* The actual navigation tabs are inside the page component */}
+        <p className="text-sm text-gray-500">
+          Use the menu above to navigate
+        </p>
       </aside>
 
       {/* 🔥 BACKDROP */}
       {showSidebar && (
         <div
           onClick={() => setShowSidebar(false)}
-          onTouchStart={() => setShowSidebar(false)}
-          className="fixed inset-0 bg-black/30 md:hidden"
+          className="fixed inset-0 bg-black/30 z-40 md:hidden"
         />
       )}
 
-      {/* 🔥 MAIN */}
-      <main className="flex-1 space-y-6 w-full">
+      {/* 🔥 MAIN CONTENT - Click outside to close sidebar on mobile */}
+      <main
+        className="flex-1 space-y-6 w-full"
+        onClick={() => showSidebar && setShowSidebar(false)}
+      >
         {children}
       </main>
 

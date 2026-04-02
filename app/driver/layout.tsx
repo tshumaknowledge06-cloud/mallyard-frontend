@@ -23,6 +23,15 @@ export default function DriverLayout({
     setShowSidebar(false);
   }, [pathname]);
 
+  const linkClass = (href: string) => {
+    const active = pathname.startsWith(href);
+    return `block px-4 py-2 rounded-md transition ${
+      active
+        ? "bg-emerald-600 text-white font-medium"
+        : "text-gray-700 hover:bg-gray-100"
+    }`;
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
 
@@ -50,7 +59,6 @@ export default function DriverLayout({
         <div className="md:hidden flex justify-end p-4">
           <button
             onClick={() => setShowSidebar(false)}
-            onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
             className="text-gray-500"
           >
             ✕
@@ -66,25 +74,16 @@ export default function DriverLayout({
 
         {/* NAV */}
         <nav className="p-4 space-y-2">
-          {links.map((link) => {
-            const active = pathname.startsWith(link.href);
-
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setShowSidebar(false)}
-                onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
-                className={`block px-4 py-2 rounded-md transition ${
-                  active
-                    ? "bg-emerald-600 text-white font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setShowSidebar(false)}
+              className={linkClass(link.href)}
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
       </aside>
@@ -93,13 +92,15 @@ export default function DriverLayout({
       {showSidebar && (
         <div
           onClick={() => setShowSidebar(false)}
-          onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
         />
       )}
 
-      {/* 🔥 MAIN CONTENT */}
-      <main className="flex-1 p-4 md:p-8 w-full">
+      {/* 🔥 MAIN CONTENT - Click outside to close sidebar on mobile */}
+      <main
+        className="flex-1 p-4 md:p-8 w-full"
+        onClick={() => showSidebar && setShowSidebar(false)}
+      >
         {children}
       </main>
 

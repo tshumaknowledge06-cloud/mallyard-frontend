@@ -263,11 +263,10 @@ export default function AccountPage() {
     }`;
 
   return (
-    <div className="flex max-w-7xl mx-auto gap-8">
-
-      {/* DESKTOP SIDEBAR ONLY */}
+    <>
+      {/* DESKTOP SIDEBAR ONLY - hidden on mobile, layout handles mobile overlay */}
       <div className="hidden md:block w-64">
-        <div className="bg-white p-6 rounded-xl shadow space-y-2">
+        <div className="bg-white p-6 rounded-xl shadow space-y-2 sticky top-4">
 
           <h2 className="font-semibold text-lg text-emerald-700 mb-4">
             Account
@@ -296,7 +295,7 @@ export default function AccountPage() {
         </div>
       </div>
 
-      {/* MAIN */}
+      {/* MAIN CONTENT */}
       <div className="flex-1 space-y-6 w-full">
 
         <h1 className="text-2xl font-bold">My Account</h1>
@@ -346,7 +345,6 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-
-    </div>
+    </>
   );
 }
