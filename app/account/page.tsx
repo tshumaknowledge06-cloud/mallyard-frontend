@@ -61,7 +61,6 @@ export default function AccountPage() {
   const [reviewText, setReviewText] = useState("");
   const [selectedListingId, setSelectedListingId] = useState<number | null>(null);
 
-  const [showSidebar, setShowSidebar] = useState(false);
   const [profile, setProfile] = useState<{ full_name: string; email: string } | null>(null);
 
   const getStatusColor = (status: string) => {
@@ -266,30 +265,36 @@ export default function AccountPage() {
   return (
     <div className="flex max-w-7xl mx-auto gap-8">
 
-      {/* MOBILE BUTTON */}
-      <button
-        onClick={() => setShowSidebar(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md rounded-full p-2"
-      >
-        ☰
-      </button>
+      {/* DESKTOP SIDEBAR ONLY */}
+      <div className="hidden md:block w-64">
+        <div className="bg-white p-6 rounded-xl shadow space-y-2">
 
-      {/* SIDEBAR */}
-      <aside className={`fixed md:relative top-0 left-0 h-full md:h-fit w-64 bg-white p-6 shadow z-50 transform transition-transform ${showSidebar ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
+          <h2 className="font-semibold text-lg text-emerald-700 mb-4">
+            Account
+          </h2>
 
-        <button onClick={() => setShowSidebar(false)} className="md:hidden mb-4">✕ Close</button>
+          <button onClick={() => setActiveTab("profile")} className={tabClass("profile")}>
+            My Profile
+          </button>
 
-        <h2 className="font-semibold text-lg text-emerald-700">Account</h2>
+          <button onClick={() => setActiveTab("active_orders")} className={tabClass("active_orders")}>
+            Active Orders
+          </button>
 
-        <button onClick={() => setActiveTab("profile")} className={tabClass("profile")}>My Profile</button>
-        <button onClick={() => setActiveTab("active_orders")} className={tabClass("active_orders")}>Active Orders</button>
-        <button onClick={() => setActiveTab("order_history")} className={tabClass("order_history")}>Orders History</button>
-        <button onClick={() => setActiveTab("pending_bookings")} className={tabClass("pending_bookings")}>Pending Bookings</button>
-        <button onClick={() => setActiveTab("booking_history")} className={tabClass("booking_history")}>Bookings History</button>
+          <button onClick={() => setActiveTab("order_history")} className={tabClass("order_history")}>
+            Orders History
+          </button>
 
-      </aside>
+          <button onClick={() => setActiveTab("pending_bookings")} className={tabClass("pending_bookings")}>
+            Pending Bookings
+          </button>
 
-      {showSidebar && <div onClick={() => setShowSidebar(false)} className="fixed inset-0 bg-black/30 md:hidden" />}
+          <button onClick={() => setActiveTab("booking_history")} className={tabClass("booking_history")}>
+            Bookings History
+          </button>
+
+        </div>
+      </div>
 
       {/* MAIN */}
       <div className="flex-1 space-y-6 w-full">

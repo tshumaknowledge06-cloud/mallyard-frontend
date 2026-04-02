@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DriverLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   const pathname = usePathname();
   const [showSidebar, setShowSidebar] = useState(false);
 
@@ -18,6 +17,11 @@ export default function DriverLayout({
     { href: "/driver/assigned", label: "Assigned Deliveries" },
     { href: "/driver/history", label: "Delivery History" },
   ];
+
+  // 🔥 AUTO CLOSE ON ROUTE CHANGE
+  useEffect(() => {
+    setShowSidebar(false);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -46,6 +50,7 @@ export default function DriverLayout({
         <div className="md:hidden flex justify-end p-4">
           <button
             onClick={() => setShowSidebar(false)}
+            onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
             className="text-gray-500"
           >
             ✕
@@ -61,9 +66,7 @@ export default function DriverLayout({
 
         {/* NAV */}
         <nav className="p-4 space-y-2">
-
           {links.map((link) => {
-
             const active = pathname.startsWith(link.href);
 
             return (
@@ -71,6 +74,7 @@ export default function DriverLayout({
                 key={link.href}
                 href={link.href}
                 onClick={() => setShowSidebar(false)}
+                onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
                 className={`block px-4 py-2 rounded-md transition ${
                   active
                     ? "bg-emerald-600 text-white font-medium"
@@ -81,7 +85,6 @@ export default function DriverLayout({
               </Link>
             );
           })}
-
         </nav>
 
       </aside>
@@ -90,6 +93,7 @@ export default function DriverLayout({
       {showSidebar && (
         <div
           onClick={() => setShowSidebar(false)}
+          onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
         />
       )}

@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function MerchantLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   const pathname = usePathname();
   const [showSidebar, setShowSidebar] = useState(false);
 
@@ -29,6 +28,11 @@ export default function MerchantLayout({
         ? "bg-emerald-700 text-white font-medium"
         : "text-gray-700 hover:bg-gray-100"
     }`;
+
+  // 🔥 AUTO CLOSE ON ROUTE CHANGE (CRITICAL UX FIX)
+  useEffect(() => {
+    setShowSidebar(false);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -56,6 +60,7 @@ export default function MerchantLayout({
         {/* 🔥 CLOSE BUTTON (MOBILE) */}
         <button
           onClick={() => setShowSidebar(false)}
+          onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
           className="md:hidden mb-4 text-gray-500"
         >
           ✕ Close
@@ -66,18 +71,17 @@ export default function MerchantLayout({
         </h2>
 
         <nav className="space-y-2">
-
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={linkClass(link.href)}
-              onClick={() => setShowSidebar(false)} // auto close mobile
+              onClick={() => setShowSidebar(false)}
+              onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
             >
               {link.label}
             </Link>
           ))}
-
         </nav>
 
       </aside>
@@ -86,6 +90,7 @@ export default function MerchantLayout({
       {showSidebar && (
         <div
           onClick={() => setShowSidebar(false)}
+          onTouchStart={() => setShowSidebar(false)} // 🔥 mobile fix
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
         />
       )}
