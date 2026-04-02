@@ -1,6 +1,7 @@
 "use client";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -26,6 +27,7 @@ interface Listing {
 export default function ComparePage() {
 
   const params = useSearchParams();
+  
   const baseId = params.get("base");
   const idsParam = params.get("ids");
 
@@ -34,12 +36,17 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (idsParam) {
-      fetchSelectedComparisons();
-    } else if (baseId) {
-      fetchComparables();
-    }
-  }, []);
+  if (!baseId && !idsParam) {
+    setLoading(false);
+    return;
+  }
+
+  if (idsParam) {
+    fetchSelectedComparisons();
+  } else if (baseId) {
+    fetchComparables();
+  }
+}, [baseId, idsParam]);
 
   // =============================
   // FETCH COMPARABLES
@@ -102,6 +109,10 @@ export default function ComparePage() {
 
     window.location.href = `/compare?ids=${selected.join(",")}`;
   };
+
+  if (!baseId && !idsParam) {
+    return <p className="p-10">Invalid comparison request</p>;
+  }
 
   if (loading) return <p className="p-10">Loading...</p>;
 
