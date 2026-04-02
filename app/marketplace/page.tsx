@@ -20,7 +20,7 @@ interface Listing {
   listing_type: "product" | "service";
 
   image_urls?: string[];
-  video_url?: string | null;
+  video_url?: string;
 
   merchant: {
     id: number;
@@ -98,7 +98,7 @@ useEffect(() => {
     listing_type: l.listing_type,
 
     image_urls: l.image_urls || [],
-    video_url: l.video_url || null,
+    video_url: l.video_url || undefined,
 
     merchant: {
       id: l.merchant?.id || 0,
@@ -199,7 +199,7 @@ useEffect(() => {
   /* ================= SCROLL ================= */
 
   const scroll = (
-    ref: React.RefObject<HTMLDivElement>,
+    ref: React.RefObject<HTMLDivElement | null>,
     dir: "left" | "right"
   ) => {
     if (!ref.current) return;
@@ -300,9 +300,9 @@ function SectionCarousel({
 }: {
   title: string;
   listings: Listing[];
-  scrollRef: React.RefObject<HTMLDivElement>;
+  scrollRef: React.RefObject<HTMLDivElement | null>;
   onScroll: (
-    ref: React.RefObject<HTMLDivElement>,
+    ref: React.RefObject<HTMLDivElement | null>,
     dir: "left" | "right"
   ) => void;
 }) {
