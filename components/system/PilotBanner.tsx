@@ -28,25 +28,40 @@ export default function PilotBanner() {
 
   return (
     <div
-      className="
-        sticky top-0 z-50
-        w-full
-        bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-800
-        text-white
-        text-xs md:text-sm
-        px-4 py-2
-        shadow-lg
-        animate-fade-in
-        border-b border-emerald-500/20
-      "
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        width: "100%",
+        background: "linear-gradient(to right, #065f46, #047857, #065f46)",
+        color: "white",
+        fontSize: "clamp(11px, 3vw, 14px)",
+        padding: "8px 16px",
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        borderBottom: "1px solid rgba(16, 185, 129, 0.2)",
+      }}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-center relative">
-
+      <div
+        style={{
+          maxWidth: "1280px",
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+        }}
+      >
         {/* 🔥 PREMIUM MESSAGE */}
-        <p className="text-center font-medium tracking-wide">
-          <span className="mr-1">🚀</span>
-          <span className="font-semibold">{PILOT_CONFIG.title}:</span>{" "}
-          <span className="opacity-90">{PILOT_CONFIG.message}</span>
+        <p
+          style={{
+            textAlign: "center",
+            fontWeight: 500,
+            letterSpacing: "0.025em",
+          }}
+        >
+          <span style={{ marginRight: "4px" }}>🚀</span>
+          <span style={{ fontWeight: 600 }}>{PILOT_CONFIG.title}:</span>{" "}
+          <span style={{ opacity: 0.9 }}>{PILOT_CONFIG.message}</span>
         </p>
 
         {/* 🔥 CLOSE BUTTON */}
@@ -55,16 +70,21 @@ export default function PilotBanner() {
             setVisible(false);
             localStorage.setItem("pilot_banner_dismissed", "true");
           }}
-          className="
-            absolute right-0
-            text-white/60 hover:text-white
-            transition
-            text-sm
-          "
+          style={{
+            position: "absolute",
+            right: 0,
+            background: "transparent",
+            border: "none",
+            color: "rgba(255, 255, 255, 0.6)",
+            cursor: "pointer",
+            fontSize: "14px",
+            transition: "color 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")}
         >
           ✕
         </button>
-
       </div>
     </div>
   );
