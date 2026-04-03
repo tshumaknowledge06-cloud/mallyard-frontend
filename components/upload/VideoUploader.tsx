@@ -14,7 +14,7 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
   const [loading, setLoading] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
   const MAX_SIZE_MB = 20;
 
   async function upload() {

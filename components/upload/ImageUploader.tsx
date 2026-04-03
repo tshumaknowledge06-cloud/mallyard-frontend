@@ -21,7 +21,7 @@ export default function ImageUploader(props: Props) {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
   const MAX_SIZE_MB = 5;
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
