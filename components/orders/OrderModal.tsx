@@ -19,7 +19,7 @@ export default function OrderModal({ listingId, onClose }: Props) {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const qtyRef = useRef<HTMLInputElement>(null);
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     qtyRef.current?.focus();
