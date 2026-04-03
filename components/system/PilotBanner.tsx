@@ -31,7 +31,6 @@ export default function PilotBanner() {
       className="
         sticky top-0 z-50
         w-full
-        backdrop-blur-md
         bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-800
         text-white
         text-xs md:text-sm

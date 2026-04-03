@@ -49,24 +49,6 @@
 }
 
 /* -------------------------------
-   Dark Mode
--------------------------------- */
-
-@media (prefers-color-scheme: dark) {
-
-  :root {
-
-    --background: #0A0A0A;
-    --foreground: #EDEDED;
-
-    --card-bg: #111111;
-    --border-color: #262626;
-
-  }
-
-}
-
-/* -------------------------------
    Base Layer
 -------------------------------- */
 
@@ -155,4 +137,8 @@ body {
 
 html, body {
   overflow-x: hidden;
+}
+
+html {
+  color-scheme: light;
 }
