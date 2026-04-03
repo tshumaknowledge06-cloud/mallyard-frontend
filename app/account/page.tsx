@@ -263,43 +263,77 @@ export default function AccountPage() {
     }`;
 
   return (
-    // ✅ FIX: Added flex container to put sidebar and content side by side
-    <div className="flex gap-8">
-      {/* DESKTOP SIDEBAR ONLY - hidden on mobile, layout handles mobile overlay */}
-      <div className="hidden md:block w-64 flex-shrink-0">
-        <div className="bg-white p-6 rounded-xl shadow space-y-2 sticky top-4">
+    // ✅ FIX: Desktop sidebar only renders on md screens and above
+    // On mobile, layout handles the sidebar overlay, so no flex container needed
+    <>
+      {/* DESKTOP LAYOUT (md and above) */}
+      <div className="hidden md:flex gap-8">
+        {/* DESKTOP SIDEBAR */}
+        <div className="w-64 flex-shrink-0">
+          <div className="bg-white p-6 rounded-xl shadow space-y-2 sticky top-4">
 
-          <h2 className="font-semibold text-lg text-emerald-700 mb-4">
-            Account
-          </h2>
+            <h2 className="font-semibold text-lg text-emerald-700 mb-4">
+              Account
+            </h2>
 
-          <button onClick={() => setActiveTab("profile")} className={tabClass("profile")}>
-            My Profile
-          </button>
+            <button onClick={() => setActiveTab("profile")} className={tabClass("profile")}>
+              My Profile
+            </button>
 
-          <button onClick={() => setActiveTab("active_orders")} className={tabClass("active_orders")}>
-            Active Orders
-          </button>
+            <button onClick={() => setActiveTab("active_orders")} className={tabClass("active_orders")}>
+              Active Orders
+            </button>
 
-          <button onClick={() => setActiveTab("order_history")} className={tabClass("order_history")}>
-            Orders History
-          </button>
+            <button onClick={() => setActiveTab("order_history")} className={tabClass("order_history")}>
+              Orders History
+            </button>
 
-          <button onClick={() => setActiveTab("pending_bookings")} className={tabClass("pending_bookings")}>
-            Pending Bookings
-          </button>
+            <button onClick={() => setActiveTab("pending_bookings")} className={tabClass("pending_bookings")}>
+              Pending Bookings
+            </button>
 
-          <button onClick={() => setActiveTab("booking_history")} className={tabClass("booking_history")}>
-            Bookings History
-          </button>
+            <button onClick={() => setActiveTab("booking_history")} className={tabClass("booking_history")}>
+              Bookings History
+            </button>
 
+          </div>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="flex-1 space-y-6 w-full min-w-0">
+          <h1 className="text-2xl font-bold">My Account</h1>
+
+          {activeTab === "profile" ? (
+            <div className="max-w-md mx-auto">
+              <Card className="p-6 space-y-4 rounded-2xl shadow-sm">
+                <h2 className="text-lg font-semibold text-emerald-700">My Profile</h2>
+
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-gray-500">Full Name</p>
+                    <p className="font-medium">{profile?.full_name || "—"}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-500">Email</p>
+                    <p className="font-medium">{profile?.email || "—"}</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+              {dataMap[activeTab]?.map((item: any) =>
+                renderCard(item, activeTab.includes("order"))
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex-1 space-y-6 w-full min-w-0">
-
-        <h1 className="text-2xl font-bold">My Account</h1>
+      {/* MOBILE LAYOUT (below md) - layout handles sidebar overlay, so only show content */}
+      <div className="block md:hidden">
+        <h1 className="text-2xl font-bold mb-6">My Account</h1>
 
         {activeTab === "profile" ? (
           <div className="max-w-md mx-auto">
@@ -320,13 +354,12 @@ export default function AccountPage() {
             </Card>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
             {dataMap[activeTab]?.map((item: any) =>
               renderCard(item, activeTab.includes("order"))
             )}
           </div>
         )}
-
       </div>
 
       {/* MODAL */}
@@ -346,6 +379,6 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
