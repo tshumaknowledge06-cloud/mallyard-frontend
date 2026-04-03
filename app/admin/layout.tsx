@@ -48,33 +48,29 @@ export default function AdminLayout({
         </button>
       )}
 
-      {/* 🔥 SIDEBAR */}
-      <div
-        className={`
-          fixed md:relative
-          top-0 left-0 h-full md:h-auto
-          w-64 bg-white shadow-md z-50
-          transform transition-transform duration-300
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
-      >
-        <AdminSidebar closeSidebar={() => setSidebarOpen(false)} />
+      {/* 🔥 DESKTOP SIDEBAR (ALWAYS VISIBLE ON MD+) */}
+      <div className="hidden md:block w-64 bg-white shadow-md">
+        <AdminSidebar closeSidebar={() => {}} />
       </div>
 
-      {/* 🔥 BACKDROP */}
+      {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
-        />
+        <>
+          {/* BACKDROP */}
+          <div
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/30 z-40 md:hidden"
+          />
+
+          {/* SIDEBAR */}
+          <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-md z-50">
+            <AdminSidebar closeSidebar={() => setSidebarOpen(false)} />
+          </div>
+        </>
       )}
 
-      {/* 🔥 MAIN CONTENT - Click outside to close sidebar on mobile */}
-      <main
-        className="flex-1 p-4 md:p-8 w-full"
-        onClick={() => sidebarOpen && setSidebarOpen(false)}
-      >
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
         {children}
       </main>
 

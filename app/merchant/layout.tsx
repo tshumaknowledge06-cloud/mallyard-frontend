@@ -45,26 +45,8 @@ export default function MerchantLayout({
         ☰
       </button>
 
-      {/* 🔥 SIDEBAR */}
-      <aside
-        className={`
-          fixed md:relative
-          top-0 left-0 h-full md:h-auto
-          w-64 bg-white shadow-md p-6 z-50
-          transform transition-transform duration-300
-          ${showSidebar ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
-      >
-
-        {/* 🔥 CLOSE BUTTON (MOBILE) */}
-        <button
-          onClick={() => setShowSidebar(false)}
-          className="md:hidden mb-4 text-gray-500"
-        >
-          ✕ Close
-        </button>
-
+      {/* 🔥 DESKTOP SIDEBAR (ALWAYS VISIBLE ON MD+) */}
+      <aside className="hidden md:block w-64 bg-white shadow-md p-6">
         <h2 className="text-xl font-bold mb-6 text-emerald-700">
           Merchant Panel
         </h2>
@@ -75,28 +57,53 @@ export default function MerchantLayout({
               key={link.href}
               href={link.href}
               className={linkClass(link.href)}
-              onClick={() => setShowSidebar(false)}
             >
               {link.label}
             </Link>
           ))}
         </nav>
-
       </aside>
 
-      {/* 🔥 BACKDROP */}
+      {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {showSidebar && (
-        <div
-          onClick={() => setShowSidebar(false)}
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
-        />
+        <>
+          {/* BACKDROP */}
+          <div
+            onClick={() => setShowSidebar(false)}
+            className="fixed inset-0 bg-black/30 z-40 md:hidden"
+          />
+
+          {/* SIDEBAR */}
+          <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-md p-6 z-50">
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="mb-4 text-gray-500"
+            >
+              ✕ Close
+            </button>
+
+            <h2 className="text-xl font-bold mb-6 text-emerald-700">
+              Merchant Panel
+            </h2>
+
+            <nav className="space-y-2">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={linkClass(link.href)}
+                  onClick={() => setShowSidebar(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </aside>
+        </>
       )}
 
-      {/* 🔥 MAIN - Click outside to close sidebar on mobile */}
-      <main
-        className="flex-1 p-4 md:p-8 w-full"
-        onClick={() => showSidebar && setShowSidebar(false)}
-      >
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
         {children}
       </main>
 

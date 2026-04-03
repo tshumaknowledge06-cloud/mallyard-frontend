@@ -43,28 +43,8 @@ export default function DriverLayout({
         ☰
       </button>
 
-      {/* 🔥 SIDEBAR */}
-      <aside
-        className={`
-          fixed md:relative
-          top-0 left-0 h-full md:h-auto
-          w-64 bg-white border-r z-50
-          transform transition-transform duration-300
-          ${showSidebar ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
-      >
-
-        {/* 🔥 CLOSE BUTTON (MOBILE) */}
-        <div className="md:hidden flex justify-end p-4">
-          <button
-            onClick={() => setShowSidebar(false)}
-            className="text-gray-500"
-          >
-            ✕
-          </button>
-        </div>
-
+      {/* 🔥 DESKTOP SIDEBAR (ALWAYS VISIBLE ON MD+) */}
+      <aside className="hidden md:block w-64 bg-white border-r">
         {/* HEADER */}
         <div className="p-6 border-b">
           <h2 className="font-semibold text-lg text-emerald-700">
@@ -78,29 +58,61 @@ export default function DriverLayout({
             <Link
               key={link.href}
               href={link.href}
-              onClick={() => setShowSidebar(false)}
               className={linkClass(link.href)}
             >
               {link.label}
             </Link>
           ))}
         </nav>
-
       </aside>
 
-      {/* 🔥 BACKDROP */}
+      {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {showSidebar && (
-        <div
-          onClick={() => setShowSidebar(false)}
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
-        />
+        <>
+          {/* BACKDROP */}
+          <div
+            onClick={() => setShowSidebar(false)}
+            className="fixed inset-0 bg-black/30 z-40 md:hidden"
+          />
+
+          {/* SIDEBAR */}
+          <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r z-50">
+            {/* CLOSE BUTTON */}
+            <div className="flex justify-end p-4">
+              <button
+                onClick={() => setShowSidebar(false)}
+                className="text-gray-500"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* HEADER */}
+            <div className="p-6 border-b">
+              <h2 className="font-semibold text-lg text-emerald-700">
+                Driver Panel
+              </h2>
+            </div>
+
+            {/* NAV */}
+            <nav className="p-4 space-y-2">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setShowSidebar(false)}
+                  className={linkClass(link.href)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </aside>
+        </>
       )}
 
-      {/* 🔥 MAIN CONTENT - Click outside to close sidebar on mobile */}
-      <main
-        className="flex-1 p-4 md:p-8 w-full"
-        onClick={() => showSidebar && setShowSidebar(false)}
-      >
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
         {children}
       </main>
 
