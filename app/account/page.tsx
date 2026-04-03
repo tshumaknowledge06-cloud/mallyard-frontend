@@ -263,9 +263,10 @@ export default function AccountPage() {
     }`;
 
   return (
-    <>
+    // ✅ FIX: Added flex container to put sidebar and content side by side
+    <div className="flex gap-8">
       {/* DESKTOP SIDEBAR ONLY - hidden on mobile, layout handles mobile overlay */}
-      <div className="hidden md:block w-64">
+      <div className="hidden md:block w-64 flex-shrink-0">
         <div className="bg-white p-6 rounded-xl shadow space-y-2 sticky top-4">
 
           <h2 className="font-semibold text-lg text-emerald-700 mb-4">
@@ -296,7 +297,7 @@ export default function AccountPage() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 space-y-6 w-full">
+      <div className="flex-1 space-y-6 w-full min-w-0">
 
         <h1 className="text-2xl font-bold">My Account</h1>
 
@@ -345,6 +346,6 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

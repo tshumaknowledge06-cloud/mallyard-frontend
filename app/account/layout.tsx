@@ -24,22 +24,25 @@ export default function AccountLayout({
     }`;
 
   return (
-    <div className="flex max-w-7xl mx-auto gap-8 relative">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
 
-      {/* 🔥 MAIN CONTENT */}
-      <main className="flex-1 space-y-6 w-full">
-        {/* MOBILE MENU BUTTON - INSIDE MAIN, BELOW HEADER */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setShowSidebar(true)}
-            className="bg-white shadow-md rounded-full p-2 text-xl"
-          >
-            ☰
-          </button>
+      {/* MOBILE MENU BUTTON */}
+      <div className="md:hidden mb-4">
+        <button
+          onClick={() => setShowSidebar(true)}
+          className="bg-white shadow-md rounded-full p-2 text-xl"
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* DESKTOP LAYOUT: SIDEBAR + CONTENT SIDE BY SIDE */}
+      <div className="flex gap-8">
+        {/* CHILDREN (page.tsx) will provide desktop sidebar + content */}
+        <div className="flex-1 min-w-0">
+          {children}
         </div>
-
-        {children}
-      </main>
+      </div>
 
       {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {showSidebar && (
