@@ -37,14 +37,6 @@ export default function MerchantLayout({
   return (
     <div className="flex min-h-screen bg-gray-100">
 
-      {/* 🔥 MOBILE MENU BUTTON */}
-      <button
-        onClick={() => setShowSidebar(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md rounded-full p-2"
-      >
-        ☰
-      </button>
-
       {/* 🔥 DESKTOP SIDEBAR (ALWAYS VISIBLE ON MD+) */}
       <aside className="hidden md:block w-64 bg-white shadow-md p-6">
         <h2 className="text-xl font-bold mb-6 text-emerald-700">
@@ -64,6 +56,21 @@ export default function MerchantLayout({
         </nav>
       </aside>
 
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
+        {/* MOBILE MENU BUTTON - INSIDE MAIN, BELOW HEADER */}
+        <div className="md:hidden mb-4">
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="bg-white shadow-md rounded-full p-2 text-xl"
+          >
+            ☰
+          </button>
+        </div>
+
+        {children}
+      </main>
+
       {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {showSidebar && (
         <>
@@ -74,7 +81,7 @@ export default function MerchantLayout({
           />
 
           {/* SIDEBAR */}
-          <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-md p-6 z-50">
+          <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-md p-6 z-50 overflow-y-auto">
             <button
               onClick={() => setShowSidebar(false)}
               className="mb-4 text-gray-500"
@@ -101,11 +108,6 @@ export default function MerchantLayout({
           </aside>
         </>
       )}
-
-      {/* 🔥 MAIN CONTENT */}
-      <main className="flex-1 p-4 md:p-8 w-full">
-        {children}
-      </main>
 
     </div>
   );

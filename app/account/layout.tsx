@@ -16,16 +16,30 @@ export default function AccountLayout({
     setShowSidebar(false);
   }, [pathname]);
 
+  const tabClass = (tab: string, currentTab: string) =>
+    `block w-full text-left px-3 py-2 rounded-md transition ${
+      pathname === tab
+        ? "bg-emerald-700 text-white font-medium"
+        : "text-gray-700 hover:bg-gray-100"
+    }`;
+
   return (
     <div className="flex max-w-7xl mx-auto gap-8 relative">
 
-      {/* 🔥 MOBILE MENU BUTTON - ONLY VISIBLE ON MOBILE */}
-      <button
-        onClick={() => setShowSidebar(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md rounded-full p-2"
-      >
-        ☰
-      </button>
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 space-y-6 w-full">
+        {/* MOBILE MENU BUTTON - INSIDE MAIN, BELOW HEADER */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="bg-white shadow-md rounded-full p-2 text-xl"
+          >
+            ☰
+          </button>
+        </div>
+
+        {children}
+      </main>
 
       {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {showSidebar && (
@@ -37,7 +51,7 @@ export default function AccountLayout({
           />
 
           {/* SIDEBAR */}
-          <aside className="md:hidden fixed top-0 left-0 h-full w-64 bg-white p-6 shadow z-50">
+          <aside className="md:hidden fixed top-0 left-0 h-full w-64 bg-white p-6 shadow z-50 overflow-y-auto">
             <button
               onClick={() => setShowSidebar(false)}
               className="mb-4 text-gray-500"
@@ -49,18 +63,60 @@ export default function AccountLayout({
               Account
             </h2>
 
-            {/* The actual navigation tabs are inside the page component */}
-            <p className="text-sm text-gray-500">
-              Use the menu above to navigate
-            </p>
+            <nav className="space-y-2">
+              <button
+                onClick={() => {
+                  window.location.href = "/account";
+                  setShowSidebar(false);
+                }}
+                className={tabClass("/account", pathname)}
+              >
+                My Profile
+              </button>
+
+              <button
+                onClick={() => {
+                  window.location.href = "/account?tab=active_orders";
+                  setShowSidebar(false);
+                }}
+                className={tabClass("/account?tab=active_orders", pathname)}
+              >
+                Active Orders
+              </button>
+
+              <button
+                onClick={() => {
+                  window.location.href = "/account?tab=order_history";
+                  setShowSidebar(false);
+                }}
+                className={tabClass("/account?tab=order_history", pathname)}
+              >
+                Orders History
+              </button>
+
+              <button
+                onClick={() => {
+                  window.location.href = "/account?tab=pending_bookings";
+                  setShowSidebar(false);
+                }}
+                className={tabClass("/account?tab=pending_bookings", pathname)}
+              >
+                Pending Bookings
+              </button>
+
+              <button
+                onClick={() => {
+                  window.location.href = "/account?tab=booking_history";
+                  setShowSidebar(false);
+                }}
+                className={tabClass("/account?tab=booking_history", pathname)}
+              >
+                Bookings History
+              </button>
+            </nav>
           </aside>
         </>
       )}
-
-      {/* 🔥 MAIN CONTENT */}
-      <main className="flex-1 space-y-6 w-full">
-        {children}
-      </main>
 
     </div>
   );

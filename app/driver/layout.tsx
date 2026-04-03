@@ -35,14 +35,6 @@ export default function DriverLayout({
   return (
     <div className="flex min-h-screen bg-gray-50">
 
-      {/* 🔥 MOBILE MENU BUTTON */}
-      <button
-        onClick={() => setShowSidebar(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md rounded-full p-2"
-      >
-        ☰
-      </button>
-
       {/* 🔥 DESKTOP SIDEBAR (ALWAYS VISIBLE ON MD+) */}
       <aside className="hidden md:block w-64 bg-white border-r">
         {/* HEADER */}
@@ -66,6 +58,21 @@ export default function DriverLayout({
         </nav>
       </aside>
 
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
+        {/* MOBILE MENU BUTTON - INSIDE MAIN, BELOW HEADER */}
+        <div className="md:hidden mb-4">
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="bg-white shadow-md rounded-full p-2 text-xl"
+          >
+            ☰
+          </button>
+        </div>
+
+        {children}
+      </main>
+
       {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {showSidebar && (
         <>
@@ -76,7 +83,7 @@ export default function DriverLayout({
           />
 
           {/* SIDEBAR */}
-          <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r z-50">
+          <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r z-50 overflow-y-auto">
             {/* CLOSE BUTTON */}
             <div className="flex justify-end p-4">
               <button
@@ -110,11 +117,6 @@ export default function DriverLayout({
           </aside>
         </>
       )}
-
-      {/* 🔥 MAIN CONTENT */}
-      <main className="flex-1 p-4 md:p-8 w-full">
-        {children}
-      </main>
 
     </div>
   );

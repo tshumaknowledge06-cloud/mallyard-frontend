@@ -38,20 +38,27 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-gray-100">
 
-      {/* 🔥 MOBILE MENU BUTTON */}
-      {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="md:hidden fixed top-4 left-4 z-40 bg-white shadow-md rounded-full p-2 text-xl"
-        >
-          ☰
-        </button>
-      )}
-
       {/* 🔥 DESKTOP SIDEBAR (ALWAYS VISIBLE ON MD+) */}
       <div className="hidden md:block w-64 bg-white shadow-md">
         <AdminSidebar closeSidebar={() => {}} />
       </div>
+
+      {/* 🔥 MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-8 w-full">
+        {/* MOBILE MENU BUTTON - INSIDE MAIN, BELOW HEADER */}
+        {!sidebarOpen && (
+          <div className="md:hidden mb-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="bg-white shadow-md rounded-full p-2 text-xl"
+            >
+              ☰
+            </button>
+          </div>
+        )}
+
+        {children}
+      </main>
 
       {/* 🔥 MOBILE SIDEBAR (CONDITIONAL OVERLAY) */}
       {sidebarOpen && (
@@ -63,16 +70,11 @@ export default function AdminLayout({
           />
 
           {/* SIDEBAR */}
-          <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-md z-50">
+          <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-md z-50 overflow-y-auto">
             <AdminSidebar closeSidebar={() => setSidebarOpen(false)} />
           </div>
         </>
       )}
-
-      {/* 🔥 MAIN CONTENT */}
-      <main className="flex-1 p-4 md:p-8 w-full">
-        {children}
-      </main>
 
     </div>
   );
