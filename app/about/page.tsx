@@ -78,8 +78,8 @@ export default function AboutPage() {
         </h2>
 
         <p className="text-gray-600 leading-relaxed">
-          The Mallyard was founded by four Zimbabwean students —
-          Knowledge Tshuma, Mayibongwe Nigel Sidile, Thomas Magade and Welcome Makawa, —
+          The Mallyard was founded by three Zimbabwean students —
+          Knowledge Tshuma, Mayibongwe Nigel Sidile and Thomas Magade, —
           driven by a shared understanding of the gaps within everyday commerce.
         </p>
 

@@ -233,7 +233,7 @@ const [contactPhone, setContactPhone] = useState("");
     />
 
     <input
-      placeholder="Location"
+      placeholder="Location(city level)"
       className="w-full mb-3 p-2 border"
       value={location}
       onChange={(e) => setLocation(e.target.value)}
