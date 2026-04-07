@@ -18,6 +18,12 @@ export default function CategoryFilter({ categories, onChange }: Props) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number | null>(null);
+
+  // ✅ MOVED UP - Define selectedCategory BEFORE the useEffect that uses it
+  const selectedCategory = selectedId
+    ? categories.find((c) => c.id === selectedId)
+    : null;
 
   // Auto-close dropdown when clicking outside
   useEffect(() => {
@@ -30,246 +36,201 @@ export default function CategoryFilter({ categories, onChange }: Props) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Infinite scrolling description
+  useEffect(() => {
+    const element = scrollRef.current;
+    const description = selectedCategory?.description;
+
+    if (!element || !description) return;
+
+    const contentWidth = element.scrollWidth;
+    const containerWidth = element.clientWidth;
+
+    if (contentWidth > containerWidth) {
+      // Clone content for infinite loop
+      const originalContent = element.innerHTML;
+      element.innerHTML = originalContent + originalContent;
+
+      let scrollAmount = 0;
+      const step = () => {
+        if (!element) return;
+        scrollAmount += 1;
+        element.scrollLeft = scrollAmount;
+        if (scrollAmount >= contentWidth) {
+          scrollAmount = 0;
+          element.scrollLeft = 0;
+        }
+        animationFrameRef.current = requestAnimationFrame(step);
+      };
+      animationFrameRef.current = requestAnimationFrame(step);
+    }
+
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      // Restore original content on cleanup
+      if (element && description) {
+        element.innerHTML = description;
+      }
+    };
+  }, [selectedCategory]);
+
   const handleSelect = (id: number | null) => {
     setSelectedId(id);
     onChange(id);
     setShowDropdown(false);
   };
 
-  const selectedCategory = selectedId
-    ? categories.find((c) => c.id === selectedId)
-    : null;
-
-  // Auto-scroll horizontal on mobile for description
-  useEffect(() => {
-    if (scrollRef.current && selectedCategory?.description) {
-      const scrollWidth = scrollRef.current.scrollWidth;
-      const clientWidth = scrollRef.current.clientWidth;
-      if (scrollWidth > clientWidth) {
-        let scrollAmount = 0;
-        const step = () => {
-          if (!scrollRef.current) return;
-          scrollAmount += 1;
-          scrollRef.current.scrollLeft = scrollAmount;
-          if (scrollAmount < scrollWidth - clientWidth) {
-            requestAnimationFrame(step);
-          } else {
-            // Reset and loop
-            setTimeout(() => {
-              if (scrollRef.current) {
-                scrollRef.current.scrollLeft = 0;
-                requestAnimationFrame(step);
-              }
-            }, 2000);
-          }
-        };
-        requestAnimationFrame(step);
-      }
-    }
-  }, [selectedCategory]);
-
   return (
-    <div className="space-y-4" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef}>
       {/* 🔥 PREMIUM SELECTOR BUTTON */}
-      <div className="relative">
-        <button
-          onClick={() => setShowDropdown(!showDropdown)}
-          className="
-            w-full sm:w-auto
-            group
-            flex items-center justify-between gap-3
-            px-5 py-3
-            bg-white
-            border-2
-            rounded-2xl
-            transition-all duration-300
-            shadow-sm hover:shadow-md
-            focus:outline-none focus:ring-2 focus:ring-emerald-500/30
-          "
-          style={{
-            borderColor: selectedId ? "#D4AF37" : "#e5e7eb",
-          }}
-        >
-          <span className="flex items-center gap-2">
-            {selectedId ? (
-              <>
-                <span className="text-base sm:text-lg">✨</span>
-                <span className="font-medium text-gray-800 text-sm sm:text-base">
-                  {selectedCategory?.name || "Category"}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="text-base sm:text-lg">📂</span>
-                <span className="font-medium text-gray-500 text-sm sm:text-base">
-                  All Categories
-                </span>
-              </>
-            )}
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className="
+          flex items-center justify-between gap-2
+          px-4 py-2
+          bg-white
+          border-2
+          rounded-xl
+          transition-all duration-300
+          shadow-sm hover:shadow-md
+          focus:outline-none focus:ring-2 focus:ring-emerald-500/30
+          text-sm
+        "
+        style={{
+          borderColor: selectedId ? "#D4AF37" : "#e5e7eb",
+          minWidth: "160px",
+        }}
+      >
+        <span className="flex items-center gap-2">
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: selectedId ? "#D4AF37" : "#9ca3af" }}
+          />
+          <span className="font-medium text-gray-700">
+            {selectedCategory?.name || "All Categories"}
           </span>
+        </span>
 
-          <svg
-            className={`w-4 h-4 transition-transform duration-300 ${
-              showDropdown ? "rotate-180" : ""
-            }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            style={{ color: selectedId ? "#D4AF37" : "#9ca3af" }}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
+        <svg
+          className={`w-3.5 h-3.5 transition-transform duration-300 ${
+            showDropdown ? "rotate-180" : ""
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          style={{ color: selectedId ? "#D4AF37" : "#9ca3af" }}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
 
-        {/* 🔥 DROPDOWN MENU - PREMIUM */}
-        {showDropdown && (
-          <div
-            className="
-              absolute top-full left-0 right-0 mt-2
-              bg-white
-              border border-gray-100
-              rounded-2xl
-              shadow-xl
-              z-50
-              overflow-hidden
-              animate-in fade-in slide-in-from-top-2 duration-200
-            "
-          >
-            {/* All Categories Option */}
-            <button
-              onClick={() => handleSelect(null)}
-              className={`
-                w-full text-left px-5 py-3
-                flex items-center justify-between
-                transition-all duration-200
-                hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent
-                border-b border-gray-50
-                ${!selectedId ? "bg-gradient-to-r from-emerald-50 to-transparent" : ""}
-              `}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-lg">📂</span>
-                <div>
-                  <p className="font-medium text-gray-800">All Categories</p>
-                  <p className="text-xs text-gray-400">Browse everything</p>
-                </div>
-              </div>
-              {!selectedId && (
-                <span
-                  className="text-xs font-semibold px-2 py-1 rounded-full"
-                  style={{ backgroundColor: "#D4AF37", color: "#1a1a1a" }}
-                >
-                  Active
-                </span>
-              )}
-            </button>
-
-            {/* Category Options */}
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => handleSelect(cat.id)}
-                className={`
-                  w-full text-left px-5 py-3
-                  flex items-center justify-between
-                  transition-all duration-200
-                  hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent
-                  border-b border-gray-50 last:border-0
-                  ${selectedId === cat.id ? "bg-gradient-to-r from-emerald-50 to-transparent" : ""}
-                `}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">✨</span>
-                  <div>
-                    <p className="font-medium text-gray-800">{cat.name}</p>
-                    {cat.description && (
-                      <p className="text-xs text-gray-400 line-clamp-1">
-                        {cat.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                {selectedId === cat.id && (
-                  <span
-                    className="text-xs font-semibold px-2 py-1 rounded-full"
-                    style={{ backgroundColor: "#D4AF37", color: "#1a1a1a" }}
-                  >
-                    Active
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 🔥 SELECTED CATEGORY BANNER (When a category is selected) */}
-      {selectedCategory && (
+      {/* 🔥 DROPDOWN MENU - FIXED POSITION, NO PAGE DISTORTION */}
+      {showDropdown && (
         <div
           className="
-            relative overflow-hidden
-            bg-gradient-to-r from-emerald-50 via-white to-emerald-50
-            border-l-4 rounded-xl
-            p-4
-            shadow-sm
-            animate-in slide-in-from-top-1 duration-300
+            absolute top-full left-0 mt-2
+            bg-white
+            border border-gray-100
+            rounded-xl
+            shadow-xl
+            z-50
+            overflow-hidden
+            animate-in fade-in slide-in-from-top-2 duration-200
           "
-          style={{ borderLeftColor: "#D4AF37" }}
+          style={{
+            minWidth: "200px",
+            maxWidth: "280px",
+            maxHeight: "300px",
+            overflowY: "auto",
+          }}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
-                {selectedCategory.name}
-              </h3>
-              {selectedCategory.description && (
-                <div
-                  ref={scrollRef}
-                  className="
-                    overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300
-                    mt-1
-                  "
-                  style={{
-                    scrollbarWidth: "thin",
-                    msOverflowStyle: "none",
-                  }}
-                >
-                  <p className="text-xs text-gray-500 whitespace-nowrap inline-block">
-                    {selectedCategory.description}
-                    <span className="inline-block w-8" />
-                  </p>
-                </div>
-              )}
-            </div>
+          {/* All Categories Option */}
+          <button
+            onClick={() => handleSelect(null)}
+            className={`
+              w-full text-left px-4 py-2.5
+              flex items-center gap-2
+              transition-all duration-200
+              hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent
+              border-b border-gray-50
+              text-sm
+              ${!selectedId ? "bg-gradient-to-r from-emerald-50 to-transparent" : ""}
+            `}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: !selectedId ? "#D4AF37" : "#d1d5db" }}
+            />
+            <span className="font-medium text-gray-700">All Categories</span>
+          </button>
 
+          {/* Category Options */}
+          {categories.map((cat) => (
             <button
-              onClick={() => handleSelect(null)}
-              className="
-                text-xs px-3 py-1.5 rounded-full
+              key={cat.id}
+              onClick={() => handleSelect(cat.id)}
+              className={`
+                w-full text-left px-4 py-2.5
+                flex flex-col gap-0.5
                 transition-all duration-200
-                hover:scale-105
-              "
-              style={{
-                backgroundColor: "#D4AF37",
-                color: "#1a1a1a",
-              }}
+                hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent
+                border-b border-gray-50 last:border-0
+                ${selectedId === cat.id ? "bg-gradient-to-r from-emerald-50 to-transparent" : ""}
+              `}
             >
-              Clear Filter
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: selectedId === cat.id ? "#D4AF37" : "#d1d5db" }}
+                />
+                <span className="font-medium text-gray-800 text-sm">
+                  {cat.name}
+                </span>
+              </div>
+              {cat.description && (
+                <p className="text-[11px] text-gray-400 line-clamp-1 pl-3.5">
+                  {cat.description}
+                </p>
+              )}
             </button>
-          </div>
+          ))}
+        </div>
+      )}
 
-          {/* 🔥 DECORATIVE GOLD LINE */}
+      {/* 🔥 SELECTED CATEGORY BANNER - COMPACT */}
+      {selectedCategory && selectedCategory.description && (
+        <div
+          className="
+            mt-3
+            overflow-hidden
+            bg-gradient-to-r from-emerald-50/50 via-white to-emerald-50/50
+            border-l-3 rounded-lg
+            py-1.5 px-3
+          "
+          style={{ borderLeftColor: "#D4AF37", borderLeftWidth: "3px" }}
+        >
           <div
-            className="absolute bottom-0 left-0 h-0.5"
+            ref={scrollRef}
+            className="
+              overflow-x-hidden whitespace-nowrap
+              text-xs text-gray-500
+              cursor-default
+            "
             style={{
-              width: "30%",
-              background: "linear-gradient(90deg, #D4AF37, transparent)",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
             }}
-          />
+          >
+            {selectedCategory.description}
+          </div>
         </div>
       )}
     </div>
