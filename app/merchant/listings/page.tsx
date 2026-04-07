@@ -149,7 +149,7 @@ export default function ListingsPage() {
               <option value="ZWL">ZWL</option>
               <option value="NGN">NGN</option>
               <option value="KES">KES</option>
-              <option value="KES">INR</option>
+              <option value="INR">INR</option>
             </select>
           </div>
         </div>
