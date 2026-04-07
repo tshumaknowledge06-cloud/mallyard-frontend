@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 import OrderTimeline from "@/components/ui/OrderTimeline";
 
 interface Order {
@@ -84,7 +85,6 @@ export default function MerchantOrders() {
   const [pickupInput, setPickupInput] = useState("");
   const [submittingPickup, setSubmittingPickup] = useState(false);
   const [listingMap, setListingMap] = useState<Record<number, Listing>>({});
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   const [pickupSubmitted, setPickupSubmitted] = useState<{
     [key: number]: boolean;
@@ -292,12 +292,12 @@ export default function MerchantOrders() {
                   <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                     {listing?.image_urls?.length ? (
                       <img
-                        src={`${API_BASE}${listing.image_urls[0]}`} 
+                        src={getMediaUrl(listing.image_urls[0])}
                         className="w-full h-full object-cover"
                       />
                     ) : listing?.video_url ? (
                       <video
-                        src={`${API_BASE}${listing.video_url}`} 
+                        src={getMediaUrl(listing.video_url)}
                         className="w-full h-full object-cover"
                       />
                     ) : (

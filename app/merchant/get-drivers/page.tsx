@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchPublic } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Driver {
   id: number;
@@ -39,13 +41,7 @@ export default function GetDriversPage() {
         url += `?city=${encodeURIComponent(cityFilter)}`;
       }
 
-      const res = await fetch(
-       `${process.env.NEXT_PUBLIC_API_URL}${url}`
-      );
-
-      if (!res.ok) throw new Error();
-
-      const data = await res.json();
+      const data = await fetchPublic(url);
       setDrivers(data);
 
     } catch {
@@ -124,7 +120,7 @@ export default function GetDriversPage() {
               <img
                 src={
                   driver.profile_image_url
-                    ? `${process.env.NEXT_PUBLIC_API_URL}${driver.profile_image_url}`
+                    ? getMediaUrl(driver.profile_image_url)
                     : "/default-avatar.png"
                 }
                 className="w-full h-32 sm:h-40 md:h-48 object-cover"
@@ -132,7 +128,7 @@ export default function GetDriversPage() {
 
               {driver.vehicle_image_url && (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${driver.vehicle_image_url}`}
+                  src={getMediaUrl(driver.vehicle_image_url)}
                   className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-12 h-9 sm:w-16 sm:h-12 object-cover rounded border shadow"
                 />
               )}

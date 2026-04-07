@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 import ImageUploader from "@/components/upload/ImageUploader";
 import VideoUploader from "@/components/upload/VideoUploader";
@@ -29,7 +30,6 @@ export default function ListingsPage() {
   const [editForm, setEditForm] = useState<any>({});
 
   const [mediaIndex, setMediaIndex] = useState<Record<number, number>>({});
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     loadListings();
@@ -149,6 +149,7 @@ export default function ListingsPage() {
               <option value="ZWL">ZWL</option>
               <option value="NGN">NGN</option>
               <option value="KES">KES</option>
+              <option value="KES">INR</option>
             </select>
           </div>
         </div>
@@ -248,8 +249,8 @@ export default function ListingsPage() {
                 }}
               >
                 {current && current.includes("video")
-                  ? <video src={`${API_BASE}${current}`} className="w-full h-full object-cover" controls />
-                  : <img src={`${API_BASE}${current}`} className="w-full h-full object-cover" />
+                  ? <video src={getMediaUrl(current)} className="w-full h-full object-cover" controls />
+                  : <img src={getMediaUrl(current)} className="w-full h-full object-cover" />
                 }
 
                 {current && (

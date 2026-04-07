@@ -9,6 +9,7 @@ import ErrorState from "@/components/ui/ErrorState";
 import Button from "@/components/ui/Button";
 
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Order {
   id: number;
@@ -165,7 +166,7 @@ export default function AccountPage() {
   const pendingBookings = bookings.filter(b => b.status === "pending");
   const bookingHistory = bookings.filter(b => b.status !== "pending");
 
-  // ✅ FIX: Enhanced Media Renderer
+  // ✅ FIX: Enhanced Media Renderer with getMediaUrl
   const renderMedia = (listing?: Listing) => {
     if (!listing) {
       return (
@@ -178,7 +179,7 @@ export default function AccountPage() {
     if (listing.image_urls?.length) {
       return (
         <img
-          src={`${process.env.NEXT_PUBLIC_API_URL}${listing.image_urls[0]}`}
+          src={getMediaUrl(listing.image_urls[0])}
           className="w-full h-full object-cover"
           alt={listing.name}
         />
@@ -188,7 +189,7 @@ export default function AccountPage() {
     if (listing.video_url) {
       return (
         <video
-          src={`${process.env.NEXT_PUBLIC_API_URL}${listing.video_url}`}
+          src={getMediaUrl(listing.video_url)}
           className="w-full h-full object-cover"
           muted
         />

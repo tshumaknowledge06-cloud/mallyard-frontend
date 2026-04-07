@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 export default function MerchantDashboard() {
   const router = useRouter();
@@ -168,7 +169,7 @@ export default function MerchantDashboard() {
             >
               {merchant.logo_url ? (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${merchant.logo_url}?t=${Date.now()}`}
+                  src={getMediaUrl(merchant.logo_url)}
                   className="w-full h-full object-cover"
                 />
               ) : (

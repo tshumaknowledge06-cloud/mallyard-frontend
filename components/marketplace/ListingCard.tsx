@@ -4,6 +4,7 @@ import Link from "next/link";
 import Card from "@/components/ui/Card";
 import { useState, useRef, useMemo, useEffect } from "react";
 import { Listing } from "@/types/listing";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Merchant {
   id: number;
@@ -28,21 +29,19 @@ export default function ListingCard({ listing }: Props) {
 
   const touchStartX = useRef<number | null>(null);
 
-  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
   // 🔥 PERFORMANCE FIX: Media array rebuilt only when listing changes
   const media = useMemo(() => [
     ...(listing.image_urls || []).map((img) => ({
       type: "image",
-      src: `${BASE_URL}${img}`,
+      src: getMediaUrl(img),
     })),
     ...(listing.video_url
       ? [{
           type: "video",
-          src: `${BASE_URL}${listing.video_url}`,
+          src: getMediaUrl(listing.video_url),
         }]
       : []),
-  ], [listing, BASE_URL]);
+  ], [listing]);
 
   // 🔥 UX FIX: Reset media index when listing changes
   useEffect(() => {

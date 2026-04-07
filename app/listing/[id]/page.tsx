@@ -12,7 +12,8 @@ import ErrorState from "@/components/ui/ErrorState";
 
 import OrderModal from "@/components/orders/OrderModal";
 import BookingModal from "@/components/bookings/BookingModal";
-import { fetchWithAuth } from "@/lib/api";
+import { fetchWithAuth, fetchPublic } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Merchant {
   id: number;
@@ -82,12 +83,7 @@ export default function ListingPage() {
 
   const fetchListing = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/listings/${id}`
-      );
-      if (!res.ok) throw new Error();
-
-      const data = await res.json();
+      const data = await fetchPublic(`/listings/${id}`);
       setListing(data);
     } catch {
       setError(true);
@@ -97,10 +93,7 @@ export default function ListingPage() {
 
   const fetchSimilar = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/listings/marketplace`
-      );
-      const data = await res.json();
+      const data = await fetchPublic("/listings/marketplace");
 
       const filtered = data.filter(
         (l: Listing) =>
@@ -116,11 +109,7 @@ export default function ListingPage() {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/reviews/${id}`
-      );
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await fetchPublic(`/reviews/${id}`);
       setReviews(data);
     } catch {}
   };
@@ -218,10 +207,10 @@ export default function ListingPage() {
   const media = [
     ...(listing?.image_urls || []).map((img) => ({
       type: "image",
-      src: `${process.env.NEXT_PUBLIC_API_URL}${img}`,
+      src: getMediaUrl(img),
     })),
     ...(listing?.video_url
-      ? [{ type: "video", src: `${process.env.NEXT_PUBLIC_API_URL}${listing.video_url}` }]
+      ? [{ type: "video", src: getMediaUrl(listing.video_url) }]
       : []),
   ];
 

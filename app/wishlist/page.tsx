@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Merchant {
   business_name: string;
@@ -132,12 +133,12 @@ export default function WishlistPage() {
 
                     {(listing.image_urls?.length ?? 0) > 0 ? (
                       <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${listing.image_urls?.[0]}`}
+                        src={getMediaUrl(listing.image_urls?.[0])}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                       />
                     ) : listing.video_url ? (
                       <video
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${listing.video_url}`}
+                        src={getMediaUrl(listing.video_url)}
                         className="w-full h-full object-cover"
                         muted
                       />

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { fetchPublic } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Merchant {
   business_name: string;
@@ -155,12 +156,12 @@ export default function ComparePage() {
 
                   {images.length > 0 ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${images[0]}`}
+                      src={getMediaUrl(images[0])}
                       className="w-full h-full object-cover"
                     />
                   ) : video ? (
                     <video
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${video}`}
+                      src={getMediaUrl(video)}
                       className="w-full h-full object-cover"
                       muted
                     />
@@ -250,12 +251,12 @@ export default function ComparePage() {
 
                 {l.image_urls?.length ? (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${l.image_urls[0]}`}
+                    src={getMediaUrl(l.image_urls[0])}
                     className="w-16 h-16 md:w-24 md:h-24 object-cover rounded"
                   />
                 ) : l.video_url ? (
                   <video
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${l.video_url}`}
+                    src={getMediaUrl(l.video_url)}
                     className="w-16 h-16 md:w-24 md:h-24 object-cover rounded"
                     muted
                   />

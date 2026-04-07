@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 export default function DriverDashboard() {
   const router = useRouter();
@@ -163,7 +164,7 @@ export default function DriverDashboard() {
                 <img
                   src={
                     profile.profile_image_url
-                      ? `${BASE_URL}${profile.profile_image_url}`
+                      ? getMediaUrl(profile.profile_image_url)
                       : "/default-avatar.png"
                   }
                   className="w-full h-full object-cover"
@@ -215,7 +216,7 @@ export default function DriverDashboard() {
                 <img
                   src={
                     profile.vehicle_image_url
-                      ? `${BASE_URL}${profile.vehicle_image_url}`
+                      ? getMediaUrl(profile.vehicle_image_url)
                       : "/default-vehicle.png"
                   }
                   className="w-full h-full object-cover"

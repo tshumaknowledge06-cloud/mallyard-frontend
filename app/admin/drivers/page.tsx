@@ -9,6 +9,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import ErrorState from "@/components/ui/ErrorState";
 
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Driver {
   id: number;
@@ -136,7 +137,7 @@ export default function DriversAdminPage() {
                 <img
                   src={
                     driver.profile_image_url
-                      ? `${process.env.NEXT_PUBLIC_API_URL}${driver.profile_image_url}`
+                      ? getMediaUrl(driver.profile_image_url)
                       : "/placeholder-avatar.png"
                   }
                   alt="profile"
@@ -159,7 +160,7 @@ export default function DriversAdminPage() {
               {driver.vehicle_image_url && (
                 <div className="relative rounded-lg overflow-hidden">
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${driver.vehicle_image_url}`}
+                    src={getMediaUrl(driver.vehicle_image_url)}
                     alt="vehicle"
                     className="w-full h-28 sm:h-32 object-cover hover:scale-105 transition-transform duration-300"
                   />

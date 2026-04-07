@@ -10,6 +10,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import ErrorState from "@/components/ui/ErrorState";
 
 import { fetchPublic } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface Merchant {
   id: number;
@@ -18,7 +19,7 @@ interface Merchant {
   merchant_type: string;
   location: string;
   contact_phone: string;
-  email?: string; // ✅ added
+  email?: string;
   status: string;
   logo_url?: string;
 }
@@ -126,12 +127,12 @@ export default function MerchantStorefrontPage() {
 
         </div>
 
-        {/* RIGHT LOGO - 🔥 FIXED: Removed localhost hardcode */}
+        {/* RIGHT LOGO - 🔥 FIXED: Using getMediaUrl */}
         <div className="flex-shrink-0">
 
           {merchant.logo_url ? (
             <img
-              src={`${process.env.NEXT_PUBLIC_API_URL}${merchant.logo_url}`}
+              src={getMediaUrl(merchant.logo_url)}
               alt="Merchant Logo"
               className="
                 w-24 h-24 md:w-28 md:h-28

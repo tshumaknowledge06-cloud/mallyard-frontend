@@ -7,6 +7,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import ErrorState from "@/components/ui/ErrorState";
 import Button from "@/components/ui/Button";
 import { fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 interface CartItem {
   cart_item_id: number;
@@ -241,12 +242,12 @@ export default function MerchantCartPage() {
 
                 {images.length > 0 ? (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${images[0]}`}
+                    src={getMediaUrl(images[0])}
                     className="w-full h-full object-cover"
                   />
                 ) : video ? (
                   <video
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${video}`}
+                    src={getMediaUrl(video)}
                     className="w-full h-full object-cover"
                     muted
                   />
