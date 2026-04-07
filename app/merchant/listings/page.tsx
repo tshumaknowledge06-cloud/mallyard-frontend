@@ -142,7 +142,12 @@ export default function ListingsPage() {
             <select
               className="border p-2 w-full rounded-lg"
               value={form.currency}
-              onChange={e => setForm({ ...form, currency: e.target.value })}
+              onChange={e =>
+                setForm((prev: any) => ({
+                  ...prev,
+                  currency: e.target.value
+               }))
+              }
             >
               <option value="USD">USD</option>
               <option value="ZAR">ZAR</option>
