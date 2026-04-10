@@ -76,7 +76,7 @@ export default function DashboardQuickAccess() {
     <button
       onClick={handleClick}
       className="
-        fixed top-20 right-6 z-50
+        fixed top-32 right-6 z-[9999]
         bg-emerald-700 hover:bg-emerald-800
         text-white
         p-3 rounded-full
