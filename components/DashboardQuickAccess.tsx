@@ -15,29 +15,59 @@ export default function DashboardQuickAccess() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
+  // 🔥 UPGRADE 1: useEffect now depends on pathname to sync with route changes
   useEffect(() => {
     const token = localStorage.getItem("access_token");
 
-    if (!token) return;
+    if (!token) {
+      setVisible(false);
+      return;
+    }
 
     try {
       const decoded: TokenPayload = jwtDecode(token);
-
       const now = Date.now() / 1000;
 
       if (decoded.exp > now) {
         setVisible(true);
       } else {
         localStorage.removeItem("access_token");
+        localStorage.removeItem("role");
+        setVisible(false);
       }
     } catch {
       localStorage.removeItem("access_token");
+      localStorage.removeItem("role");
+      setVisible(false);
     }
-  }, []);
+  }, [pathname]); // 🔥 key upgrade - re-run when route changes
 
-  // 🔥 FIX: Move conditional return AFTER all hooks
-  // Hide on homepage - but after hooks are registered
+  // Hide on homepage - after hooks are registered
   if (pathname === "/") return null;
+
+  const normalizeRole = (role?: string) => {
+    if (!role) return undefined;
+
+    const normalized = role.toLowerCase().replace(/[-\s]/g, "_");
+
+    if (normalized === "seller") return "merchant";
+    if (normalized === "admin") return "admin";
+    if (normalized === "delivery_partner") return "delivery_partner";
+    if (normalized === "customer") return "customer";
+
+    return undefined;
+  };
+
+  const redirectByRole = (role: string) => {
+    const routes: Record<string, string> = {
+      admin: "/admin/dashboard",
+      merchant: "/merchant/dashboard",
+      delivery_partner: "/driver/dashboard",
+      customer: "/marketplace",
+    };
+
+    router.push(routes[role] || "/marketplace");
+  };
 
   const handleClick = () => {
     const token = localStorage.getItem("access_token");
@@ -53,19 +83,32 @@ export default function DashboardQuickAccess() {
 
       if (decoded.exp < now) {
         localStorage.removeItem("access_token");
+        localStorage.removeItem("role");
         router.push("/login?next=dashboard");
         return;
       }
 
-      if (decoded.role === "seller") {
-        router.push("/merchant/dashboard");
-      } else if (decoded.role === "delivery_partner") {
-        router.push("/delivery/dashboard");
-      } else {
-        router.push("/");
+      // USE STORED ROLE FIRST (more reliable)
+      const storedRole = localStorage.getItem("role");
+
+      if (storedRole) {
+        redirectByRole(storedRole);
+        return;
       }
+
+      // fallback to token role
+      const actualRole = normalizeRole(decoded.role);
+
+      if (!actualRole) {
+        // 🔥 UPGRADE 2: Better fallback - keep user inside product experience
+        router.push("/marketplace");
+        return;
+      }
+
+      redirectByRole(actualRole);
     } catch {
       localStorage.removeItem("access_token");
+      localStorage.removeItem("role");
       router.push("/login");
     }
   };
