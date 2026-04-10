@@ -73,6 +73,16 @@ export default function ListingPage() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // 🔥 NEW: State for showing full listing name in modal/popup
+  const [showFullNameModal, setShowFullNameModal] = useState(false);
+
+  // 🔥 Helper function to truncate listing name
+  const truncateName = (name: string, maxLength: number = 15) => {
+    if (!name) return "";
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength) + "...";
+  };
+
   useEffect(() => {
     fetchListing();
   }, []);
@@ -220,6 +230,28 @@ export default function ListingPage() {
   return (
     <div className="w-full">
 
+      {/* 🔥 FULL NAME MODAL/POPUP */}
+      {showFullNameModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Listing Name
+            </h3>
+            <p className="text-gray-700 break-words">
+              {listing.name}
+            </p>
+            <div className="mt-5 flex justify-end">
+              <button
+                onClick={() => setShowFullNameModal(false)}
+                className="px-4 py-2 bg-emerald-700 text-white rounded-lg hover:bg-emerald-800 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MAIN */}
       <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
 
@@ -294,7 +326,21 @@ export default function ListingPage() {
           {/* DETAILS */}
           <div className="space-y-6">
 
-            <h1 className="text-3xl font-bold">{listing.name}</h1>
+            {/* 🔥 TRUNCATED LISTING NAME WITH CLICK TO VIEW FULL */}
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold">
+                {truncateName(listing.name, 15)}
+              </h1>
+              {listing.name.length > 15 && (
+                <button
+                  onClick={() => setShowFullNameModal(true)}
+                  className="text-emerald-600 hover:text-emerald-800 transition text-sm font-medium"
+                  title="Click to see full name"
+                >
+                  ⓘ
+                </button>
+              )}
+            </div>
 
             <Link
               href={`/store/${listing.merchant.id}`}
