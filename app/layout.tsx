@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SandyChat from "@/components/SandyChat";
 import PilotBanner from "@/components/system/PilotBanner";
+import DashboardQuickAccess from "@/components/DashboardQuickAccess";
 
 import type { Metadata } from "next";
 
@@ -32,6 +33,9 @@ export default function RootLayout({
 
         {/* Header */}
         <Header />
+
+        {/* Dashboard Quick Access - Only visible for logged-in users (component handles visibility internally) */}
+        <DashboardQuickAccess />
 
         {/* Main Content */}
         <main className="flex-1 container-page">
