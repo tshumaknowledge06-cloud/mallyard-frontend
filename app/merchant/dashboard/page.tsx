@@ -53,9 +53,11 @@ export default function MerchantDashboard() {
 
       if (merchantInfo?.id) {
         try {
-          listingsData = await fetchWithAuth(
+          const storefrontData = await fetchWithAuth(
             `/merchants/${merchantInfo.id}/storefront`
           );
+          // 🔥 FIX: Extract listings array from the response object
+          listingsData = storefrontData.listings || [];
         } catch {
           listingsData = [];
         }

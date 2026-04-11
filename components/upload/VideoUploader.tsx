@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { fetchWithAuth } from "@/lib/api";
 
 interface Props {
   id?: string;
@@ -14,7 +15,6 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
   const [loading, setLoading] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
   const MAX_SIZE_MB = 20;
 
   async function upload() {
@@ -37,22 +37,11 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
     formData.append("file", file);
 
     try {
-      const res = await fetch(`${BASE_URL}${endpoint}`, {
+      // 🔥 FIX: Use fetchWithAuth (no manual Content-Type header for FormData)
+      const data = await fetchWithAuth(endpoint, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
+        body: formData,
       });
-
-      // 🔥 SAFE JSON PARSING
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        alert(data?.detail || "Upload failed");
-        setLoading(false);
-        return;
-      }
 
       onUploaded?.(data.video_url);
 
@@ -61,11 +50,12 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
       // 🔥 CLEAR INPUT PROPERLY
       if (inputRef.current) inputRef.current.value = "";
 
-    } catch {
-      alert("Upload error");
+    } catch (err: any) {
+      console.error("Video upload error:", err);
+      alert(err?.message || "Upload failed");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
@@ -89,7 +79,7 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
 
           setFile(selected);
         }}
-        className="hidden" // 🔥 hide ugly input (premium UX)
+        className="hidden"
       />
 
       {/* 🔥 UX IMPROVEMENT: SHOW SELECTED FILE NAME */}
@@ -103,7 +93,7 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
         <button
           onClick={upload}
           disabled={loading}
-          className="bg-yellow-600 hover:bg-purple-800 text-white px-4 py-2 rounded transition disabled:opacity-50"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition disabled:opacity-50"
         >
           {loading ? "Uploading..." : "Upload Video"}
         </button>
