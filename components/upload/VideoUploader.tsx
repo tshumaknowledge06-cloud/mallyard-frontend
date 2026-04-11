@@ -34,6 +34,7 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
     formData.append("file", file);
 
     try {
+      // 🔥 USE RAW FETCH (NOT fetchWithAuth) for FormData
       const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
