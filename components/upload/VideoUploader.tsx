@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { fetchWithAuth } from "@/lib/api";
 
 interface Props {
   id?: string;
@@ -15,15 +14,13 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
   const [loading, setLoading] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
   const MAX_SIZE_MB = 20;
 
   async function upload() {
-    // 🔥 PREVENT DOUBLE UPLOAD
     if (loading) return;
-    
     if (!file) return;
 
-    // 🔥 TOKEN SAFETY
     const token = localStorage.getItem("access_token");
 
     if (!token) {
@@ -37,31 +34,35 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
     formData.append("file", file);
 
     try {
-      // 🔥 FIX: Use fetchWithAuth (no manual Content-Type header for FormData)
-      const data = await fetchWithAuth(endpoint, {
+      const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
-        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
       });
 
-      onUploaded?.(data.video_url);
+      const data = await res.json().catch(() => null);
 
+      if (!res.ok) {
+        alert(data?.detail || "Upload failed");
+        setLoading(false);
+        return;
+      }
+
+      onUploaded?.(data.video_url);
       setFile(null);
-      
-      // 🔥 CLEAR INPUT PROPERLY
       if (inputRef.current) inputRef.current.value = "";
 
-    } catch (err: any) {
-      console.error("Video upload error:", err);
-      alert(err?.message || "Upload failed");
-    } finally {
-      setLoading(false);
+    } catch {
+      alert("Upload error");
     }
+
+    setLoading(false);
   }
 
   return (
     <div className="space-y-3">
-
-      {/* ✅ FIXED INPUT */}
       <input
         ref={inputRef}
         id={id}
@@ -71,7 +72,6 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
           const selected = e.target.files?.[0];
           if (!selected) return;
 
-          // 🔥 FILE SIZE GUARD
           if (selected.size > MAX_SIZE_MB * 1024 * 1024) {
             alert(`Video too large (max ${MAX_SIZE_MB}MB)`);
             return;
@@ -82,7 +82,6 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
         className="hidden"
       />
 
-      {/* 🔥 UX IMPROVEMENT: SHOW SELECTED FILE NAME */}
       {file && (
         <p className="text-xs text-gray-500 truncate">
           {file.name}
@@ -98,7 +97,6 @@ export default function VideoUploader({ id, endpoint, onUploaded }: Props) {
           {loading ? "Uploading..." : "Upload Video"}
         </button>
       )}
-
     </div>
   );
 }

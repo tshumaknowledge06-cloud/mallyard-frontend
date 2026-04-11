@@ -201,9 +201,11 @@ export default function MerchantDashboard() {
       {/* STATS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
 
-        <div className="bg-white p-4 md:p-6 rounded-2xl shadow">
-          <p className="text-gray-600 text-sm">Total Listings</p>
-          <h2 className="text-xl md:text-2xl font-bold">
+        <div className="bg-white p-6 rounded-2xl shadow flex flex-col justify-between h-28">
+          <p className="text-gray-600 text-sm">
+            Total Listings
+          </p>
+          <h2 className="text-2xl font-bold">
             {listings.length}
           </h2>
         </div>
