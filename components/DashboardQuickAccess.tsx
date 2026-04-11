@@ -60,7 +60,7 @@ export default function DashboardQuickAccess() {
 
   const redirectByRole = (role: string) => {
     const routes: Record<string, string> = {
-      admin: "/admin/dashboard",
+      admin: "/admin", // 🔥 CHANGED: from "/admin/dashboard" to "/admin"
       merchant: "/merchant/dashboard",
       delivery_partner: "/driver/dashboard",
       customer: "/marketplace",
