@@ -123,7 +123,8 @@ useEffect(() => {
 
   const fetchTrending = async () => {
     try {
-      const data = await fetchPublic("/trending/");
+      // 🔥 EXTENDED: Request more trending items (limit=50)
+      const data = await fetchPublic("/trending/?limit=50");
       setTrending((data || []).map(normalizeListing));
     } catch {
       setTrending([]);
@@ -132,7 +133,8 @@ useEffect(() => {
 
   const fetchRecentlyViewed = async () => {
     try {
-      const data = await fetchWithAuth("/recently-viewed/");
+      // 🔥 EXTENDED: Request more recently viewed items (limit=50)
+      const data = await fetchWithAuth("/recently-viewed/?limit=50");
 
       const normalized = (data || []).map((item: any) =>
         normalizeListing(item.listing)
@@ -150,12 +152,12 @@ useEffect(() => {
     setLoading(true);
 
     try {
-      let url = "/listings/marketplace";
+      let url = "/listings/marketplace?page=1&page_size=100";
 
       const storedLocation = localStorage.getItem("selectedLocation");
 
       if (storedLocation) {
-        url += `?location=${encodeURIComponent(storedLocation)}`;
+        url += `&location=${encodeURIComponent(storedLocation)}`;
       }
 
       const data = await fetchPublic(url, {},);

@@ -7,6 +7,12 @@ import { getMediaUrl } from "@/lib/getMediaUrl";
 import ImageUploader from "@/components/upload/ImageUploader";
 import VideoUploader from "@/components/upload/VideoUploader";
 
+// 🔥 Bulletproof video detection by file extension
+const isVideo = (url: string) => {
+  if (!url) return false;
+  return /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
+};
+
 export default function ListingsPage() {
   const [form, setForm] = useState<any>({
     name: "",
@@ -253,14 +259,15 @@ export default function ListingsPage() {
                   e.target.addEventListener("touchend", handleEnd, { once: true });
                 }}
               >
-                {current && current.includes("video")
+                {/* 🔥 FIX: Bulletproof video detection using isVideo() */}
+                {current && isVideo(current)
                   ? <video src={getMediaUrl(current)} className="w-full h-full object-cover" controls />
                   : <img src={getMediaUrl(current)} className="w-full h-full object-cover" />
                 }
 
                 {current && (
                   <button
-                    onClick={() => current.includes("video")
+                    onClick={() => isVideo(current)
                       ? deleteVideo(l.id)
                       : deleteImage(l.id, current)
                     }
