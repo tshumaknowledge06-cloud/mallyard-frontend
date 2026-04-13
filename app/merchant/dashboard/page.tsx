@@ -155,7 +155,7 @@ export default function MerchantDashboard() {
               <p className="text-sm text-yellow-700">
                 <span className="font-medium">Your store is under verification.</span>
                 <br />
-                You can create listings now — they will go live once approved.
+                You can create listings now (Nevigate via the left menu) — they will go live once approved.
               </p>
             </div>
           </div>
