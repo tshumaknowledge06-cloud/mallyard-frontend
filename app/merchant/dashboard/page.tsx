@@ -144,6 +144,24 @@ export default function MerchantDashboard() {
         Merchant Dashboard
       </h1>
 
+      {/* 🔥 PENDING VERIFICATION MESSAGE */}
+      {merchant?.status === "pending_verification" && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <span className="text-yellow-600 text-lg">🟡</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <span className="font-medium">Your store is under verification.</span>
+                <br />
+                You can create listings now — they will go live once approved.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PROFILE CARD */}
       {merchant && (
         <div className="bg-white p-4 md:p-6 rounded-2xl shadow flex flex-col md:flex-row gap-6 md:items-center justify-between">

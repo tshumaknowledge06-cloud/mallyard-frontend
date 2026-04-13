@@ -378,7 +378,7 @@ const [contactPhone, setContactPhone] = useState("");
       </p>
 
       <button
-        onClick={() => router.push(`/login/seller`)}
+        onClick={() => router.push(`/login/merchant`)}
         className="w-full bg-emerald-700 text-white py-2 rounded hover:bg-emerald-800"
       >
         Continue to Login
