@@ -15,6 +15,16 @@ export default function DriverDashboard() {
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  // 🔥 EDIT PROFILE STATE
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: "",
+    phone_number: "",
+    operating_city: "",
+    vehicle_type: ""
+  });
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const savedRole = localStorage.getItem("role");
@@ -50,6 +60,40 @@ export default function DriverDashboard() {
       setError(err?.message || "Failed to load driver dashboard.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  // 🔥 OPEN EDIT MODAL
+  function openEdit() {
+    if (!profile) return;
+
+    setEditForm({
+      full_name: profile.full_name || "",
+      phone_number: profile.phone_number || "",
+      operating_city: profile.operating_city || "",
+      vehicle_type: profile.vehicle_type || ""
+    });
+
+    setIsEditing(true);
+  }
+
+  // 🔥 SAVE EDIT
+  async function handleSave() {
+    try {
+      setSaving(true);
+
+      await fetchWithAuth("/delivery/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm)
+      });
+
+      setIsEditing(false);
+      load(); // refresh data
+    } catch {
+      alert("Failed to update profile");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -125,7 +169,16 @@ export default function DriverDashboard() {
 
       {/* PROFILE CARD */}
       {profile && (
-        <div className="bg-white p-4 md:p-6 rounded-2xl shadow flex flex-col md:flex-row gap-6 md:items-center justify-between">
+        <div className="relative bg-white p-4 md:p-6 rounded-2xl shadow flex flex-col md:flex-row gap-6 md:items-center justify-between">
+
+          {/* 🔥 EDIT ICON (TOP RIGHT) */}
+          <button
+            onClick={openEdit}
+            className="absolute top-4 right-4 text-gray-400 hover:text-emerald-700 transition"
+            title="Edit Profile"
+          >
+            ✏️
+          </button>
 
           {/* LEFT */}
           <div className="space-y-2 flex-1">
@@ -183,7 +236,7 @@ export default function DriverDashboard() {
                 }}
               />
 
-              {/* 🔥 GOLD BUTTON */}
+              {/* 🔥 GOLD BUTTON - UPDATED LABEL */}
               <label
                 htmlFor="profileUpload"
                 className="
@@ -200,7 +253,7 @@ export default function DriverDashboard() {
                   transition-all
                 "
               >
-                Edit Profile
+                Update Photo
               </label>
 
             </div>
@@ -235,7 +288,7 @@ export default function DriverDashboard() {
                 }}
               />
 
-              {/* 🔥 GOLD BUTTON */}
+              {/* 🔥 GOLD BUTTON - UPDATED LABEL */}
               <label
                 htmlFor="vehicleUpload"
                 className="
@@ -252,7 +305,7 @@ export default function DriverDashboard() {
                   transition-all
                 "
               >
-                Edit Vehicle
+                Update Vehicle
               </label>
 
             </div>
@@ -283,6 +336,72 @@ export default function DriverDashboard() {
         </div>
 
       </div>
+
+      {/* 🔥 EDIT PROFILE MODAL */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white w-[95%] md:w-[480px] rounded-2xl p-6 shadow-xl space-y-4">
+
+            <h2 className="text-lg font-semibold text-emerald-900">
+              Edit Profile
+            </h2>
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Full Name"
+              value={editForm.full_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, full_name: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Phone Number"
+              value={editForm.phone_number}
+              onChange={(e) =>
+                setEditForm({ ...editForm, phone_number: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Operating City"
+              value={editForm.operating_city}
+              onChange={(e) =>
+                setEditForm({ ...editForm, operating_city: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Vehicle Type"
+              value={editForm.vehicle_type}
+              onChange={(e) =>
+                setEditForm({ ...editForm, vehicle_type: e.target.value })
+              }
+            />
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "Done"}
+              </button>
+
+              <button
+                onClick={() => setIsEditing(false)}
+                className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

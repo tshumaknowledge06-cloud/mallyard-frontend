@@ -45,6 +45,10 @@ export default function MarketplacePage() {
   const [recentlyViewed, setRecentlyViewed] = useState<Listing[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  
+  // 🔥 NEW: Product/Service filter state - default to "service"
+  const [listingTypeFilter, setListingTypeFilter] = useState<"product" | "service">("service");
+  
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
@@ -192,11 +196,14 @@ useEffect(() => {
 
   /* ================= FILTER ================= */
 
-  const filteredListings = selectedCategory
-    ? listings.filter(
-        (l) => l.subcategory.category_id === selectedCategory
-      )
-    : listings;
+  // 🔥 FIXED: Combined filtering logic (category + listing_type)
+  const filteredListings = listings.filter((l) => {
+    // Category filter
+    if (selectedCategory && l.subcategory.category_id !== selectedCategory) return false;
+    // Product/Service filter
+    if (listingTypeFilter && l.listing_type !== listingTypeFilter) return false;
+    return true;
+  });
 
   /* ================= SCROLL ================= */
 
@@ -253,10 +260,43 @@ useEffect(() => {
         </p>
       )}
 
-      <CategoryFilter
-        categories={categories}
-        onChange={setSelectedCategory}
-      />
+      {/* 🔥 FILTERS ROW: Category Filter + Product/Service Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        
+        <CategoryFilter
+          categories={categories}
+          onChange={setSelectedCategory}
+        />
+
+        {/* 🔥 PRODUCT/SERVICE TOGGLE BUTTONS */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setListingTypeFilter("service")}
+            className={`
+              px-5 py-2 rounded-xl text-sm font-medium transition-all duration-200
+              ${listingTypeFilter === "service" 
+                ? "border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm" 
+                : "border border-gray-200 bg-white text-gray-500 hover:border-[#D4AF37]/50 hover:text-[#D4AF37]/70"
+              }
+            `}
+          >
+            Services
+          </button>
+          
+          <button
+            onClick={() => setListingTypeFilter("product")}
+            className={`
+              px-5 py-2 rounded-xl text-sm font-medium transition-all duration-200
+              ${listingTypeFilter === "product" 
+                ? "border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm" 
+                : "border border-gray-200 bg-white text-gray-500 hover:border-[#D4AF37]/50 hover:text-[#D4AF37]/70"
+              }
+            `}
+          >
+            Products
+          </button>
+        </div>
+      </div>
 
       {loading && <LoadingState />}
 

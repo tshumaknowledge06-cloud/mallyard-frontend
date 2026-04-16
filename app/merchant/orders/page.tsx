@@ -5,6 +5,24 @@ import { fetchWithAuth } from "@/lib/api";
 import { getMediaUrl } from "@/lib/getMediaUrl";
 import OrderTimeline from "@/components/ui/OrderTimeline";
 
+// 🔥 Helper function to generate tel link
+function getTelLink(phone?: string) {
+  if (!phone || phone.trim() === "") return null;
+  // Remove spaces for clean dialer
+  const cleanPhone = phone.replace(/\s/g, "");
+  return `tel:${cleanPhone}`;
+}
+
+// 🔥 Helper function to copy phone number to clipboard
+async function copyToClipboard(phone: string) {
+  try {
+    await navigator.clipboard.writeText(phone);
+    alert("Phone number copied to clipboard!");
+  } catch {
+    alert("Failed to copy phone number");
+  }
+}
+
 interface Order {
   id: number;
   status: string;
@@ -237,14 +255,16 @@ export default function MerchantOrders() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Merchant Orders</h1>
+    <div className="max-w-5xl mx-auto px-3 sm:px-0">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
+        Merchant Orders
+      </h1>
 
       {orders.length === 0 && (
-        <p className="text-gray-500">No active orders at the moment.</p>
+        <p className="text-gray-500 text-sm">No active orders at the moment.</p>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {orders.map((o) => {
           const listing = o.listing_id ? listingMap[o.listing_id] : undefined;
           const deliveryRequest = deliveryMap.get(o.id);
@@ -262,34 +282,37 @@ export default function MerchantOrders() {
           const alreadySubmitted = pickupSubmitted[o.id] === true;
 
           return (
-            <div key={o.id} className="bg-white p-6 rounded shadow">
-              <div className="flex justify-between gap-4 items-start">
-                <div className="flex gap-4 items-start w-full">
+            <div
+              key={o.id}
+              className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow border border-gray-100"
+            >
+              <div className="flex justify-between gap-3 sm:gap-4 items-start">
+                <div className="flex gap-3 sm:gap-4 items-start w-full">
                   {/* LEFT SIDE (INFO) */}
                   <div className="flex-1">
                     {/* LISTING NAME */}
-                    <p className="font-semibold text-lg">
+                    <p className="font-semibold text-base sm:text-lg break-words">
                       {listing?.name || "Listing"}
                     </p>
 
                     {/* QUANTITY */}
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
                       Quantity: {o.quantity ?? "-"}
                     </p>
 
                     {/* TOTAL */}
-                    <p className="text-sm font-medium text-emerald-700">
+                    <p className="text-xs sm:text-sm font-medium text-emerald-700">
                       Total: {listing ? `${(listing.price * (o.quantity || 0)).toFixed(2)} ${listing.currency}` : "-"}
                     </p>
 
                     {/* STATUS */}
-                    <p className="text-xs text-gray-500 mt-1 capitalize">
+                    <p className="text-[11px] sm:text-xs text-gray-500 mt-1 capitalize">
                       Status: {formatStatus(timelineStatus)}
                     </p>
                   </div>
 
                   {/* RIGHT SIDE (IMAGE) */}
-                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                     {listing?.image_urls?.length ? (
                       <img
                         src={getMediaUrl(listing.image_urls[0])}
@@ -301,7 +324,7 @@ export default function MerchantOrders() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                      <div className="w-full h-full flex items-center justify-center text-[10px] sm:text-xs text-gray-400">
                         No Media
                       </div>
                     )}
@@ -309,24 +332,68 @@ export default function MerchantOrders() {
                 </div>
               </div>
 
-              <OrderTimeline status={timelineStatus} />
+              <div className="mt-3 sm:mt-4">
+                <OrderTimeline status={timelineStatus} />
+              </div>
 
-              <div className="mt-4 text-sm text-gray-700 space-y-1">
+              <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-700 space-y-1">
                 <p>Delivery Method: {o.delivery_method}</p>
-                <p>
+                <p className="break-words">
                   Dropoff:{" "}
-                  {deliveryRequest?.dropoff_address || o.dropoff_address}
+                  {deliveryRequest?.dropoff_address || o.dropoff_address || "Not specified"}
                 </p>
 
-                {/* CUSTOMER CONTACT */}
+                {/* 🔥 CUSTOMER CONTACT WITH CALL BUTTON & COPY */}
                 {o.customer_phone && (
-                  <p className="text-sm font-medium text-gray-800">
-                    Customer Contact: {o.customer_phone}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <span className="text-xs sm:text-sm text-gray-700">
+                      Customer Contact:
+                    </span>
+                    {getTelLink(o.customer_phone) ? (
+                      <>
+                        <a
+                          href={getTelLink(o.customer_phone)!}
+                          className="
+                            px-2 sm:px-3 py-1
+                            rounded-full
+                            bg-blue-50
+                            border border-blue-200
+                            text-blue-700
+                            text-[10px] sm:text-xs
+                            font-medium
+                            hover:bg-blue-100
+                            transition
+                            inline-flex items-center gap-1
+                          "
+                        >
+                          📞 Call Customer
+                        </a>
+                        <button
+                          onClick={() => copyToClipboard(o.customer_phone!)}
+                          className="
+                            px-2 sm:px-3 py-1
+                            rounded-full
+                            bg-gray-100
+                            border border-gray-200
+                            text-gray-600
+                            text-[10px] sm:text-xs
+                            font-medium
+                            hover:bg-gray-200
+                            transition
+                            inline-flex items-center gap-1
+                          "
+                        >
+                          📋 Copy
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-gray-400 text-xs">Invalid number</span>
+                    )}
+                  </div>
                 )}
 
                 {deliveryRequest?.status && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-[11px] sm:text-xs text-gray-500">
                     Delivery Status: {formatStatus(deliveryRequest.status)}
                   </p>
                 )}
@@ -334,12 +401,12 @@ export default function MerchantOrders() {
 
               {["pending", "accepted", "preparing"].includes(o.status) && (
                 <div className="mt-4">
-                  <label className="text-sm font-medium mr-2">
+                  <label className="text-xs sm:text-sm font-medium mr-2">
                     Update Status
                   </label>
 
                   <select
-                    className="border rounded px-3 py-2"
+                    className="border rounded px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm"
                     defaultValue=""
                     onChange={(e) => {
                       const value = e.target.value;
@@ -373,14 +440,14 @@ export default function MerchantOrders() {
                   {!alreadySubmitted ? (
                     <button
                       onClick={() => openPickupModal(o.id)}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
                     >
                       Submit Pickup Address
                     </button>
                   ) : (
                     <button
                       disabled
-                      className="px-4 py-2 bg-green-100 text-green-700 rounded cursor-not-allowed"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-green-100 text-green-700 rounded-lg cursor-not-allowed"
                     >
                       Pickup Address Submitted ✓
                     </button>
@@ -394,28 +461,28 @@ export default function MerchantOrders() {
 
       {showPickupModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
-            <h2 className="text-lg font-semibold mb-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
               Submit Pickup Address
             </h2>
 
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2">
               Pickup Address
             </label>
 
             <input
               type="text"
               placeholder="Enter pickup address"
-              className="border rounded px-3 py-2 w-full"
+              className="border rounded-lg px-3 py-2 w-full text-sm"
               value={pickupInput}
               onChange={(e) => setPickupInput(e.target.value)}
             />
 
-            <div className="mt-5 flex justify-end gap-3">
+            <div className="mt-4 sm:mt-5 flex justify-end gap-2 sm:gap-3">
               <button
                 onClick={closePickupModal}
                 disabled={submittingPickup}
-                className="px-4 py-2 border rounded"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg hover:bg-gray-50 transition"
               >
                 Cancel
               </button>
@@ -423,7 +490,7 @@ export default function MerchantOrders() {
               <button
                 onClick={submitPickupAddress}
                 disabled={submittingPickup}
-                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
               >
                 {submittingPickup ? "Submitting..." : "Done"}
               </button>

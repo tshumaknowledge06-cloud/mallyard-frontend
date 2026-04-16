@@ -79,7 +79,7 @@ export default function CategoryFilter({ categories, onChange }: Props) {
 
   const handleSelect = (id: number | null) => {
     setSelectedId(id);
-    onChange(id);
+    onChange(id); // ✅ Pass the category ID to parent for filtering
     setShowDropdown(false);
   };
 

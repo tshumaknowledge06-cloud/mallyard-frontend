@@ -144,6 +144,24 @@ export default function OrderModal({ listingId, onClose }: Props) {
             </option>
           </select>
 
+          {/* 🔥 PREMIUM DELIVERY FEE INFO LINE */}
+          {deliveryMethod === "delivery" && (
+            <div
+              className="
+                mt-1 px-4 py-3
+                rounded-xl
+                border border-yellow-300/40
+                bg-gradient-to-br from-yellow-50/60 to-transparent
+                backdrop-blur-sm
+                text-[13px]
+                text-yellow-700
+                shadow-[0_4px_20px_rgba(234,179,8,0.15)]
+              "
+            >
+              ✨ Delivery charges may apply based on your location and will be communicated by the seller after your request.
+            </div>
+          )}
+
           <input
             type="text"
             value={dropoffAddress}
