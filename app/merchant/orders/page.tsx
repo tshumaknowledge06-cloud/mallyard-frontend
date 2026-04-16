@@ -343,11 +343,14 @@ export default function MerchantOrders() {
                   {deliveryRequest?.dropoff_address || o.dropoff_address || "Not specified"}
                 </p>
 
-                {/* 🔥 CUSTOMER CONTACT WITH CALL BUTTON & COPY */}
+                {/* 🔥 CUSTOMER CONTACT - Phone number inline with buttons */}
                 {o.customer_phone && (
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className="text-xs sm:text-sm text-gray-700">
                       Customer Contact:
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-900 font-medium">
+                      {o.customer_phone}
                     </span>
                     {getTelLink(o.customer_phone) ? (
                       <>
@@ -366,7 +369,7 @@ export default function MerchantOrders() {
                             inline-flex items-center gap-1
                           "
                         >
-                          📞 Call Customer
+                          📞 Call
                         </a>
                         <button
                           onClick={() => copyToClipboard(o.customer_phone!)}

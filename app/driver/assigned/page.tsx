@@ -130,7 +130,7 @@ export default function AssignedDeliveries() {
                   </p>
                 </div>
 
-                {/* 🔥 SELLER DETAILS WITH CALL BUTTON */}
+                {/* 🔥 SELLER DETAILS WITH PHONE NUMBER INLINE */}
                 <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
                   <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1 sm:mb-2">
                     Seller Details
@@ -141,6 +141,9 @@ export default function AssignedDeliveries() {
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className="text-xs sm:text-sm text-gray-800">
                       <span className="font-medium">Phone:</span>
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-900 font-medium">
+                      {d.seller_phone || "Not available"}
                     </span>
                     {getTelLink(d.seller_phone) ? (
                       <>
@@ -159,7 +162,7 @@ export default function AssignedDeliveries() {
                             inline-flex items-center gap-1
                           "
                         >
-                          📞 Call Seller
+                          📞 Call
                         </a>
                         <button
                           onClick={() => copyToClipboard(d.seller_phone)}
@@ -180,12 +183,12 @@ export default function AssignedDeliveries() {
                         </button>
                       </>
                     ) : (
-                      <span className="text-gray-400 text-xs">Not available</span>
+                      <span className="text-gray-400 text-xs">Invalid number</span>
                     )}
                   </div>
                 </div>
 
-                {/* 🔥 CUSTOMER DETAILS WITH CALL BUTTON */}
+                {/* 🔥 CUSTOMER DETAILS WITH PHONE NUMBER INLINE */}
                 <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
                   <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1 sm:mb-2">
                     Customer Details
@@ -196,6 +199,9 @@ export default function AssignedDeliveries() {
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className="text-xs sm:text-sm text-gray-800">
                       <span className="font-medium">Phone:</span>
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-900 font-medium">
+                      {d.customer_phone || "Not available"}
                     </span>
                     {getTelLink(d.customer_phone) ? (
                       <>
@@ -214,7 +220,7 @@ export default function AssignedDeliveries() {
                             inline-flex items-center gap-1
                           "
                         >
-                          📞 Call Customer
+                          📞 Call
                         </a>
                         <button
                           onClick={() => copyToClipboard(d.customer_phone)}
@@ -235,7 +241,7 @@ export default function AssignedDeliveries() {
                         </button>
                       </>
                     ) : (
-                      <span className="text-gray-400 text-xs">Not available</span>
+                      <span className="text-gray-400 text-xs">Invalid number</span>
                     )}
                   </div>
                 </div>

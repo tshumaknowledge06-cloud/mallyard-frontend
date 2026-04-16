@@ -55,6 +55,9 @@ export default function MarketplacePage() {
 
   const trendingRef = useRef<HTMLDivElement>(null);
   const recentRef = useRef<HTMLDivElement>(null);
+  
+  // 🔥 Store refs for each category row
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const isLoggedIn =
     typeof window !== "undefined" &&
@@ -196,7 +199,7 @@ useEffect(() => {
 
   /* ================= FILTER ================= */
 
-  // 🔥 FIXED: Combined filtering logic (category + listing_type)
+  // 🔥 Combined filtering logic (category + listing_type)
   const filteredListings = listings.filter((l) => {
     // Category filter
     if (selectedCategory && l.subcategory.category_id !== selectedCategory) return false;
@@ -204,6 +207,16 @@ useEffect(() => {
     if (listingTypeFilter && l.listing_type !== listingTypeFilter) return false;
     return true;
   });
+
+  // 🔥 Group filtered listings by category name
+  const groupedListings = filteredListings.reduce((acc, listing) => {
+    const categoryName = listing.subcategory?.name || "Uncategorized";
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+    acc[categoryName].push(listing);
+    return acc;
+  }, {} as Record<string, Listing[]>);
 
   /* ================= SCROLL ================= */
 
@@ -217,6 +230,12 @@ useEffect(() => {
       left: dir === "left" ? -320 : 320,
       behavior: "smooth",
     });
+  };
+
+  // 🔥 Category-specific scroll handler
+  const scrollCategory = (categoryName: string, dir: "left" | "right") => {
+    const ref = { current: categoryRefs.current[categoryName] };
+    scroll(ref, dir);
   };
 
   return (
@@ -260,20 +279,18 @@ useEffect(() => {
         </p>
       )}
 
-      {/* 🔥 FILTERS ROW: Category Filter + Product/Service Toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        
+      {/* 🔥 FILTERS ROW: Category Filter + Product/Service Toggle (tight gap) */}
+      <div className="flex flex-wrap items-center gap-2">
         <CategoryFilter
           categories={categories}
           onChange={setSelectedCategory}
         />
 
-        {/* 🔥 PRODUCT/SERVICE TOGGLE BUTTONS */}
         <div className="flex gap-2">
           <button
             onClick={() => setListingTypeFilter("service")}
             className={`
-              px-5 py-2 rounded-xl text-sm font-medium transition-all duration-200
+              px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
               ${listingTypeFilter === "service" 
                 ? "border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm" 
                 : "border border-gray-200 bg-white text-gray-500 hover:border-[#D4AF37]/50 hover:text-[#D4AF37]/70"
@@ -286,7 +303,7 @@ useEffect(() => {
           <button
             onClick={() => setListingTypeFilter("product")}
             className={`
-              px-5 py-2 rounded-xl text-sm font-medium transition-all duration-200
+              px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
               ${listingTypeFilter === "product" 
                 ? "border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37] shadow-sm" 
                 : "border border-gray-200 bg-white text-gray-500 hover:border-[#D4AF37]/50 hover:text-[#D4AF37]/70"
@@ -307,24 +324,59 @@ useEffect(() => {
         />
       )}
 
+      {/* 🔥 Category-based horizontal rows (same behavior as Trending) */}
       {!loading && filteredListings.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+        <div className="space-y-10">
+          {Object.entries(groupedListings).map(([categoryName, categoryListings]) => (
+            <div key={categoryName} className="space-y-4">
+              
+              <h2 className="text-xl font-semibold text-emerald-700">
+                {categoryName}
+              </h2>
 
-          {filteredListings.map((listing) => (
-            <div
-              key={listing.id}
-              className="transition duration-300 hover:-translate-y-1 md:hover:shadow-2xl shadow-sm md:shadow-md rounded-xl"
-            >
-              <div
-                onClick={() => {
-                  if (isLoggedIn) recordView(listing.id);
-                }}
-              >
-                <ListingCard listing={listing} />
+              <div className="relative group overflow-hidden">
+                <button
+                  onClick={() => scrollCategory(categoryName, "left")}
+                  className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100 transition"
+                >
+                  ‹
+                </button>
+
+                <button
+                  onClick={() => scrollCategory(categoryName, "right")}
+                  className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100 transition"
+                >
+                  ›
+                </button>
+
+                <div
+                  ref={(el) => {
+                    categoryRefs.current[categoryName] = el;
+                  }}
+                  className="flex gap-5 overflow-x-auto scroll-smooth no-scrollbar"
+                  style={{
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                  }}
+                >
+                  {categoryListings.map((listing) => (
+                    <div
+                      key={listing.id}
+                      className="min-w-[200px] sm:min-w-[240px] max-w-[240px] flex-shrink-0"
+                    >
+                      <div
+                        onClick={() => {
+                          if (isLoggedIn) recordView(listing.id);
+                        }}
+                      >
+                        <ListingCard listing={listing} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
-
         </div>
       )}
 
@@ -380,7 +432,6 @@ function SectionCarousel({
             msOverflowStyle: "none",
           }}
         >
-          {/* ✅ FIX: removed duplication */}
           {listings.map((listing) => (
             <div
               key={listing.id}

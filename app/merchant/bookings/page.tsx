@@ -84,10 +84,13 @@ export default function MerchantBookings() {
               {b.description}
             </p>
 
-            {/* 🔥 CUSTOMER CONTACT WITH CALL BUTTON & COPY */}
+            {/* 🔥 CUSTOMER CONTACT - Phone number inline with buttons */}
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <span className="text-xs sm:text-sm text-gray-600">
                 Contact:
+              </span>
+              <span className="text-xs sm:text-sm text-gray-900 font-medium">
+                {b.contact_number}
               </span>
               {getTelLink(b.contact_number) ? (
                 <>
@@ -106,7 +109,7 @@ export default function MerchantBookings() {
                       inline-flex items-center gap-1
                     "
                   >
-                    📞 Call Customer
+                    📞 Call
                   </a>
                   <button
                     onClick={() => copyToClipboard(b.contact_number)}
@@ -127,7 +130,7 @@ export default function MerchantBookings() {
                   </button>
                 </>
               ) : (
-                <span className="text-gray-400 text-xs">Not available</span>
+                <span className="text-gray-400 text-xs">Invalid number</span>
               )}
             </div>
 
