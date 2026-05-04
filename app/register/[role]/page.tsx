@@ -28,21 +28,30 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 🔥 NEW
+  const [showPassword, setShowPassword] = useState(false);
+
+  // 🔥 NEW CUSTOMER FIELDS
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [defaultAddress, setDefaultAddress] = useState("");
+  const [cityName, setCityName] = useState("");
 
   // DELIVERY
   const [phone, setPhone] = useState("");
   const [vehicleType, setVehicleType] = useState("");
   const [licenseNumber, setLicenseNumber] = useState("");
   const [operatingCity, setOperatingCity] = useState("");
-  const [showDeliveryPassword, setShowDeliveryPassword] = useState(false); // 🔥 NEW
+  const [showDeliveryPassword, setShowDeliveryPassword] = useState(false);
 
   // MERCHANT
-const [businessName, setBusinessName] = useState("");
-const [description, setDescription] = useState("");
-const [merchantType, setMerchantType] = useState("seller");
-const [location, setLocation] = useState("");
-const [contactPhone, setContactPhone] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [description, setDescription] = useState("");
+  const [merchantType, setMerchantType] = useState("seller");
+  const [location, setLocation] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  
+  // 🔥 NEW MERCHANT FIELDS
+  const [pickupAddress, setPickupAddress] = useState("");
+  const [merchantCity, setMerchantCity] = useState("");
 
   // ✅ AUTO DIRECT DELIVERY USERS
   useEffect(() => {
@@ -66,7 +75,11 @@ const [contactPhone, setContactPhone] = useState("");
           email,
           password,
           full_name: fullName,
-          role
+          role,
+          // 🔥 NEW CUSTOMER FIELDS
+          phone_number: role === "customer" ? phoneNumber : null,
+          default_address: role === "customer" ? defaultAddress : null,
+          city_name: role === "customer" ? cityName : null,
         })
       });
 
@@ -134,46 +147,49 @@ const [contactPhone, setContactPhone] = useState("");
   }
 
   async function handleMerchantSubmit(e: React.FormEvent) {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!userId) {
-    alert("User not found. Please try again.");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const data = await fetchPublic(`/merchants/register?user_id=${userId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        business_name: businessName,
-        description,
-        merchant_type: merchantType,
-        location,
-        contact_phone: contactPhone,
-        payment_methods: [],
-      }),
-    });
-
-    if (!data) {
-      alert("Merchant registration failed");
-      setLoading(false);
+    if (!userId) {
+      alert("User not found. Please try again.");
       return;
     }
 
-    // ✅ SUCCESS FLOW
-    setShowMerchantPopup(true);
+    setLoading(true);
 
-  } catch (err: any) {
-    alert(err?.message || "Network error");
+    try {
+      const data = await fetchPublic(`/merchants/register?user_id=${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          business_name: businessName,
+          description,
+          merchant_type: merchantType,
+          location,
+          contact_phone: contactPhone,
+          // 🔥 NEW MERCHANT FIELDS
+          pickup_address: pickupAddress,
+          city_name: merchantCity,
+          payment_methods: [],
+        }),
+      });
+
+      if (!data) {
+        alert("Merchant registration failed");
+        setLoading(false);
+        return;
+      }
+
+      // ✅ SUCCESS FLOW
+      setShowMerchantPopup(true);
+
+    } catch (err: any) {
+      alert(err?.message || "Network error");
+    }
+
+    setLoading(false);
   }
-
-  setLoading(false);
-}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-emerald-50">
@@ -229,6 +245,35 @@ const [contactPhone, setContactPhone] = useState("");
             </button>
           </div>
 
+          {/* 🔥 NEW CUSTOMER FIELDS (only for customers) */}
+          {role === "customer" && (
+            <>
+              <input
+                type="text"
+                placeholder="Phone Number"
+                className="w-full mb-4 px-4 py-2 border rounded"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="Default Address"
+                className="w-full mb-4 px-4 py-2 border rounded"
+                value={defaultAddress}
+                onChange={(e) => setDefaultAddress(e.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="City"
+                className="w-full mb-4 px-4 py-2 border rounded"
+                value={cityName}
+                onChange={(e) => setCityName(e.target.value)}
+              />
+            </>
+          )}
+
           <button className="w-full bg-emerald-700 text-white py-2 rounded">
             {loading ? "Registering..." : "Continue"}
           </button>
@@ -237,48 +282,63 @@ const [contactPhone, setContactPhone] = useState("");
       )}
 
       {/* ✅ MERCHANT FORM (FIXED MISSING STEP) */}
-{step === "merchant" && (
-  <form
-    onSubmit={handleMerchantSubmit}
-    className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
-  >
-    <h2 className="text-xl font-semibold mb-4 text-emerald-800">
-      Complete Your Business Profile 🏪
-    </h2>
+      {step === "merchant" && (
+        <form
+          onSubmit={handleMerchantSubmit}
+          className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
+        >
+          <h2 className="text-xl font-semibold mb-4 text-emerald-800">
+            Complete Your Business Profile 🏪
+          </h2>
 
-    <input
-      placeholder="Business Name"
-      className="w-full mb-3 p-2 border"
-      value={businessName}
-      onChange={(e) => setBusinessName(e.target.value)}
-    />
+          <input
+            placeholder="Business Name"
+            className="w-full mb-3 p-2 border"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+          />
 
-    <input
-      placeholder="Location(city level)"
-      className="w-full mb-3 p-2 border"
-      value={location}
-      onChange={(e) => setLocation(e.target.value)}
-    />
+          <input
+            placeholder="Location(city level)"
+            className="w-full mb-3 p-2 border"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
 
-    <input
-      placeholder="Contact Phone"
-      className="w-full mb-3 p-2 border"
-      value={contactPhone}
-      onChange={(e) => setContactPhone(e.target.value)}
-    />
+          <input
+            placeholder="Contact Phone"
+            className="w-full mb-3 p-2 border"
+            value={contactPhone}
+            onChange={(e) => setContactPhone(e.target.value)}
+          />
 
-    <textarea
-      placeholder="Business Description"
-      className="w-full mb-4 p-2 border"
-      value={description}
-      onChange={(e) => setDescription(e.target.value)}
-    />
+          {/* 🔥 NEW MERCHANT FIELDS */}
+          <input
+            placeholder="Parcel Pickup Default Address"
+            className="w-full mb-3 p-2 border"
+            value={pickupAddress}
+            onChange={(e) => setPickupAddress(e.target.value)}
+          />
 
-    <button className="w-full bg-emerald-700 text-white py-2 rounded">
-      {loading ? "Submitting..." : "Complete Registration"}
-    </button>
-  </form>
-)}
+          <input
+            placeholder="City"
+            className="w-full mb-3 p-2 border"
+            value={merchantCity}
+            onChange={(e) => setMerchantCity(e.target.value)}
+          />
+
+          <textarea
+            placeholder="Business Description"
+            className="w-full mb-4 p-2 border"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
+          <button className="w-full bg-emerald-700 text-white py-2 rounded">
+            {loading ? "Submitting..." : "Complete Registration"}
+          </button>
+        </form>
+      )}
 
       {/* ✅ DELIVERY (ONE STEP FULL FORM) */}
       {step === "delivery" && (
@@ -360,34 +420,34 @@ const [contactPhone, setContactPhone] = useState("");
       )}
 
       {/* ✅ PREMIUM MERCHANT POPUP */}
-{showMerchantPopup && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+      {showMerchantPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
 
-    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl text-center">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl text-center">
 
-      <h3 className="text-xl font-semibold text-emerald-800 mb-3">
-        🏪 Welcome to The Mallyard Network
-      </h3>
+            <h3 className="text-xl font-semibold text-emerald-800 mb-3">
+              🏪 Welcome to The Mallyard Network
+            </h3>
 
-      <p className="text-gray-700 mb-6">
-        Your merchant application has been successfully submitted.
-        <br /><br />
-        Your business is now on the path to reaching a wider, trusted marketplace.
-        <br /><br />
-        Once approved, you will be notified via your registered contact details, and you’ll gain full access to your merchant dashboard to start selling, growing, and scaling your business.
-      </p>
+            <p className="text-gray-700 mb-6">
+              Your merchant application has been successfully submitted.
+              <br /><br />
+              Your business is now on the path to reaching a wider, trusted marketplace.
+              <br /><br />
+              Once approved, you will be notified via your registered contact details, and you’ll gain full access to your merchant dashboard to start selling, growing, and scaling your business.
+            </p>
 
-      <button
-        onClick={() => router.push(`/login/merchant`)}
-        className="w-full bg-emerald-700 text-white py-2 rounded hover:bg-emerald-800"
-      >
-        Continue to Login
-      </button>
+            <button
+              onClick={() => router.push(`/login/merchant`)}
+              className="w-full bg-emerald-700 text-white py-2 rounded hover:bg-emerald-800"
+            >
+              Continue to Login
+            </button>
 
-    </div>
+          </div>
 
-  </div>
-)}
+        </div>
+      )}
 
     </div>
   );

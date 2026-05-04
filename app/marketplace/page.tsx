@@ -63,6 +63,14 @@ export default function MarketplacePage() {
     typeof window !== "undefined" &&
     !!localStorage.getItem("access_token");
 
+  // 🔥 Function to clear location filter
+  const clearLocationFilter = () => {
+    localStorage.removeItem("selectedLocation");
+    setLocation("");
+    window.dispatchEvent(new Event("locationChanged"));
+    setRefreshKey(prev => prev + 1);
+  };
+
   useEffect(() => {
   loadLocation();
   fetchListings();
@@ -271,12 +279,20 @@ useEffect(() => {
         />
       )}
 
-      {/* LOCATION */}
+      {/* LOCATION WITH EXIT LINK */}
       {location && (
-        <p className="text-sm text-gray-500">
-          Showing in{" "}
-          <span className="font-semibold">{location}</span>
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-gray-500">
+            Showing in{" "}
+            <span className="font-semibold">{location}</span>
+          </p>
+          <button
+            onClick={clearLocationFilter}
+            className="text-sm text-blue-600 underline hover:text-blue-800 transition"
+          >
+            Exit
+          </button>
+        </div>
       )}
 
       {/* 🔥 FILTERS ROW: Category Filter + Product/Service Toggle (tight gap) */}

@@ -18,6 +18,17 @@ export default function OrderModal({ listingId, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
+  // 🔥 ORDER SUMMARY STATE
+  const [orderSummary, setOrderSummary] = useState<{
+    total_price: number | null;
+    delivery_price: number | null;
+    estimated_delivery_days: number | null;
+  }>({
+    total_price: null,
+    delivery_price: null,
+    estimated_delivery_days: null,
+  });
+
   const qtyRef = useRef<HTMLInputElement>(null);
   const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -82,6 +93,13 @@ export default function OrderModal({ listingId, onClose }: Props) {
         setLoading(false);
         return;
       }
+
+      // 🔥 STORE ORDER SUMMARY FROM RESPONSE
+      setOrderSummary({
+        total_price: data.total_price || null,
+        delivery_price: data.delivery_price || null,
+        estimated_delivery_days: data.estimated_delivery_days || null,
+      });
 
       // 🔥 SUCCESS UX POLISH: Reset form
       setQuantity(1);
@@ -211,6 +229,9 @@ export default function OrderModal({ listingId, onClose }: Props) {
           message="Your order has been successfully submitted to the merchant."
           note="Visit the merchant storefront to view their contact details and follow up on your order if needed."
           encouragement="Keep exploring The Yard — your next great find could be just ahead."
+          totalPrice={orderSummary.total_price || undefined}
+          deliveryPrice={orderSummary.delivery_price || undefined}
+          estimatedDays={orderSummary.estimated_delivery_days || undefined}
           onClose={handleSuccessClose}
         />
       )}

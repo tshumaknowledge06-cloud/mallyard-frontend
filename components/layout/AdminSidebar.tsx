@@ -11,12 +11,14 @@ export default function AdminSidebar({
   const pathname = usePathname();
 
   const links = [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/drivers", label: "Drivers" },
-    { href: "/admin/merchants", label: "Merchants" },
-    { href: "/admin/deliveries", label: "Deliveries" },
-    { href: "/admin/analytics", label: "Analytics" },
-  ];
+    { href: "/admin", label: "📊 Dashboard" },
+    { href: "/admin/drivers", label: "👨‍✈️ Drivers" },
+    { href: "/admin/merchants", label: "🏪 Merchants" },
+    { href: "/admin/city_management", label: "🏙️ City Management" },
+    { href: "/admin/route_management", label: "🚚 Route Management" },
+    { href: "/admin/deliveries", label: "📦 Deliveries" },
+    { href: "/admin/analytics", label: "📈 Analytics" },
+ ];
 
   return (
     <aside

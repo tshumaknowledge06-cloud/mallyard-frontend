@@ -24,7 +24,9 @@ export default function MerchantDashboard() {
     business_name: "",
     description: "",
     location: "",
-    contact_phone: ""
+    contact_phone: "",
+    pickup_address: "",  // 🔥 NEW
+    city_name: ""        // 🔥 NEW
   });
   const [saving, setSaving] = useState(false);
 
@@ -103,7 +105,9 @@ export default function MerchantDashboard() {
       business_name: merchant.business_name || "",
       description: merchant.description || "",
       location: merchant.location || "",
-      contact_phone: merchant.contact_phone || ""
+      contact_phone: merchant.contact_phone || "",
+      pickup_address: merchant.pickup_address || "",  // 🔥 NEW
+      city_name: merchant.city?.name || ""           // 🔥 NEW
     });
 
     setIsEditing(true);
@@ -205,15 +209,6 @@ export default function MerchantDashboard() {
       {merchant && (
         <div className="relative bg-white p-4 md:p-6 rounded-2xl shadow flex flex-col md:flex-row gap-6 md:items-center justify-between">
 
-          {/* 🔥 EDIT ICON (TOP RIGHT) */}
-          <button
-            onClick={openEdit}
-            className="absolute top-4 right-4 text-gray-400 hover:text-emerald-700 transition"
-            title="Edit Profile"
-          >
-            ✏️
-          </button>
-
           {/* LEFT */}
           <div className="text-gray-700 space-y-1 flex-1 text-sm md:text-base">
 
@@ -229,7 +224,7 @@ export default function MerchantDashboard() {
           </div>
 
           {/* RIGHT LOGO */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center relative">
 
             <div
               onClick={handleLogoClick}
@@ -246,6 +241,15 @@ export default function MerchantDashboard() {
                 </span>
               )}
             </div>
+
+            {/* 🔥 EDIT ICON MOVED TO BOTTOM LEFT OF LOGO */}
+            <button
+              onClick={openEdit}
+              className="absolute -bottom-2 -left-2 bg-white rounded-full p-1.5 shadow-md text-gray-400 hover:text-emerald-700 transition border border-gray-200"
+              title="Edit Profile"
+            >
+              ✏️
+            </button>
 
             <span className="text-[11px] text-gray-500 mt-2">
               Tap to update logo
@@ -348,6 +352,25 @@ export default function MerchantDashboard() {
               value={editForm.contact_phone}
               onChange={(e) =>
                 setEditForm({ ...editForm, contact_phone: e.target.value })
+              }
+            />
+
+            {/* 🔥 NEW MERCHANT FIELDS */}
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Pickup Address"
+              value={editForm.pickup_address}
+              onChange={(e) =>
+                setEditForm({ ...editForm, pickup_address: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="City"
+              value={editForm.city_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, city_name: e.target.value })
               }
             />
 

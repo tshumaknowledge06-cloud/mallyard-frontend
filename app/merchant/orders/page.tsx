@@ -31,6 +31,8 @@ interface Order {
   pickup_address?: string;
   delivery_pickup_address?: string;
   customer_phone?: string;
+  delivery_price?: number;
+  estimated_delivery_days?: number;
   
   listing_id?: number;
   listing_name?: string;
@@ -143,15 +145,15 @@ export default function MerchantOrders() {
       const listings: Record<number, Listing> = {};
 
       await Promise.all(
-  activeOrders.map(async (o: Order) => {
-    try {
-      if (!o.listing_id) return;
+        activeOrders.map(async (o: Order) => {
+          try {
+            if (!o.listing_id) return;
 
-      const data = await fetchWithAuth(`/listings/${o.listing_id}`);
-      listings[o.listing_id] = data;
-    } catch {}
-  })
-);
+            const data = await fetchWithAuth(`/listings/${o.listing_id}`);
+            listings[o.listing_id] = data;
+          } catch {}
+        })
+      );
 
       setListingMap(listings);
       setDeliveryRequests(deliveryList);
@@ -304,6 +306,20 @@ export default function MerchantOrders() {
                     <p className="text-xs sm:text-sm font-medium text-emerald-700">
                       Total: {listing ? `${(listing.price * (o.quantity || 0)).toFixed(2)} ${listing.currency}` : "-"}
                     </p>
+
+                    {/* 🔥 DELIVERY PRICE (NEW) */}
+                    {isDeliveryOrder && o.delivery_price !== undefined && (
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                        Delivery Fee: ${o.delivery_price.toFixed(2)}
+                      </p>
+                    )}
+
+                    {/* 🔥 ESTIMATED DELIVERY DAYS (NEW) */}
+                    {isDeliveryOrder && o.estimated_delivery_days !== undefined && (
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        Est. Delivery: {o.estimated_delivery_days} day(s)
+                      </p>
+                    )}
 
                     {/* STATUS */}
                     <p className="text-[11px] sm:text-xs text-gray-500 mt-1 capitalize">

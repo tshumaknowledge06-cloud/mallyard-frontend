@@ -19,6 +19,9 @@ interface Order {
   delivery_method: string;
   dropoff_address: string;
   created_at: string;
+  total_price?: number;
+  delivery_price?: number;
+  estimated_delivery_days?: number;
 }
 
 interface Booking {
@@ -62,7 +65,17 @@ export default function AccountPage() {
   const [reviewText, setReviewText] = useState("");
   const [selectedListingId, setSelectedListingId] = useState<number | null>(null);
 
-  const [profile, setProfile] = useState<{ full_name: string; email: string } | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+
+  // 🔥 EDIT PROFILE STATE
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: "",
+    phone_number: "",
+    default_address: "",
+    city_name: ""
+  });
+  const [saving, setSaving] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -100,14 +113,12 @@ export default function AccountPage() {
       await Promise.all(
         allListingIds.map(async (id: number) => {
           try {
-            // ✅ FIX: Directly assign data from fetchWithAuth
             const data = await fetchWithAuth(`/listings/${id}`);
             listings[id] = data;
 
             const mId = data.merchant.id;
 
             if (!merchants[mId]) {
-              // ✅ FIX: Fixed Merchant Fetch pattern
               const mData = await fetchWithAuth(`/merchants/${mId}/storefront`);
               merchants[mId] = {
                 business_name: mData.merchant.business_name,
@@ -158,6 +169,38 @@ export default function AccountPage() {
     }
   };
 
+  function openEdit() {
+    if (!profile) return;
+
+    setEditForm({
+      full_name: profile.full_name || "",
+      phone_number: profile.phone_number || "",
+      default_address: profile.default_address || "",
+      city_name: profile.city?.name || ""
+    });
+
+    setIsEditing(true);
+  }
+
+  async function handleSave() {
+    try {
+      setSaving(true);
+
+      await fetchWithAuth("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm)
+      });
+
+      setIsEditing(false);
+      loadAccountData();
+    } catch {
+      alert("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) return <LoadingState />;
   if (error) return <ErrorState message={error} />;
 
@@ -166,7 +209,6 @@ export default function AccountPage() {
   const pendingBookings = bookings.filter(b => b.status === "pending");
   const bookingHistory = bookings.filter(b => b.status !== "pending");
 
-  // ✅ FIX: Enhanced Media Renderer with getMediaUrl
   const renderMedia = (listing?: Listing) => {
     if (!listing) {
       return (
@@ -209,6 +251,8 @@ export default function AccountPage() {
       ? merchantMap[item.merchant_id]
       : merchantMap[item.seller_id];
 
+    const isDeliveryOrder = item.delivery_method === "delivery";
+
     return (
       <div key={item.id} className="h-full flex flex-col border border-gray-100 rounded-2xl p-3 bg-white shadow-sm hover:shadow-lg transition">
 
@@ -223,7 +267,26 @@ export default function AccountPage() {
             <p className="text-xs text-gray-500 line-clamp-1">{merchant?.business_name}</p>
           </div>
 
-          <div className="mt-3 flex items-center justify-between">
+          {/* 🔥 PRICE INFORMATION */}
+          <div className="mt-2 space-y-0.5">
+            {item.total_price !== undefined && (
+              <p className="text-xs text-gray-600">
+                Total: {listing?.currency} {item.total_price.toFixed(2)}
+              </p>
+            )}
+            {isDeliveryOrder && item.delivery_price !== undefined && (
+              <p className="text-xs text-gray-600">
+                Delivery Fee: {listing?.currency} {item.delivery_price.toFixed(2)}
+              </p>
+            )}
+            {isDeliveryOrder && item.estimated_delivery_days !== undefined && (
+              <p className="text-xs text-gray-600">
+                Est. Delivery: {item.estimated_delivery_days} day(s)
+              </p>
+            )}
+          </div>
+
+          <div className="mt-2 flex items-center justify-between">
             <div className={`px-2 py-1 text-[11px] rounded-full ${getStatusColor(item.status)}`}>
               {item.status}
             </div>
@@ -264,12 +327,9 @@ export default function AccountPage() {
     }`;
 
   return (
-    // ✅ FIX: Desktop sidebar only renders on md screens and above
-    // On mobile, layout handles the sidebar overlay, so no flex container needed
     <>
       {/* DESKTOP LAYOUT (md and above) */}
       <div className="hidden md:flex gap-8">
-        {/* DESKTOP SIDEBAR */}
         <div className="w-64 flex-shrink-0">
           <div className="bg-white p-6 rounded-xl shadow space-y-2 sticky top-4">
 
@@ -300,14 +360,22 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* MAIN CONTENT */}
         <div className="flex-1 space-y-6 w-full min-w-0">
           <h1 className="text-2xl font-bold">My Account</h1>
 
           {activeTab === "profile" ? (
             <div className="max-w-md mx-auto">
               <Card className="p-6 space-y-4 rounded-2xl shadow-sm">
-                <h2 className="text-lg font-semibold text-emerald-700">My Profile</h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-emerald-700">My Profile</h2>
+                  <button
+                    onClick={openEdit}
+                    className="text-gray-400 hover:text-emerald-700 transition text-sm"
+                    title="Edit Profile"
+                  >
+                    ✏️ Edit
+                  </button>
+                </div>
 
                 <div className="space-y-3 text-sm">
                   <div>
@@ -318,6 +386,21 @@ export default function AccountPage() {
                   <div>
                     <p className="text-gray-500">Email</p>
                     <p className="font-medium">{profile?.email || "—"}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-500">Phone Number</p>
+                    <p className="font-medium">{profile?.phone_number || "—"}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-500">Default Address</p>
+                    <p className="font-medium">{profile?.default_address || "—"}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-500">City</p>
+                    <p className="font-medium">{profile?.city?.name || "—"}</p>
                   </div>
                 </div>
               </Card>
@@ -332,14 +415,23 @@ export default function AccountPage() {
         </div>
       </div>
 
-      {/* MOBILE LAYOUT (below md) - layout handles sidebar overlay, so only show content */}
+      {/* MOBILE LAYOUT (below md) */}
       <div className="block md:hidden">
         <h1 className="text-2xl font-bold mb-6">My Account</h1>
 
         {activeTab === "profile" ? (
           <div className="max-w-md mx-auto">
             <Card className="p-6 space-y-4 rounded-2xl shadow-sm">
-              <h2 className="text-lg font-semibold text-emerald-700">My Profile</h2>
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-semibold text-emerald-700">My Profile</h2>
+                <button
+                  onClick={openEdit}
+                  className="text-gray-400 hover:text-emerald-700 transition text-sm"
+                  title="Edit Profile"
+                >
+                  ✏️ Edit
+                </button>
+              </div>
 
               <div className="space-y-3 text-sm">
                 <div>
@@ -350,6 +442,21 @@ export default function AccountPage() {
                 <div>
                   <p className="text-gray-500">Email</p>
                   <p className="font-medium">{profile?.email || "—"}</p>
+                </div>
+
+                <div>
+                  <p className="text-gray-500">Phone Number</p>
+                  <p className="font-medium">{profile?.phone_number || "—"}</p>
+                </div>
+
+                <div>
+                  <p className="text-gray-500">Default Address</p>
+                  <p className="font-medium">{profile?.default_address || "—"}</p>
+                </div>
+
+                <div>
+                  <p className="text-gray-500">City</p>
+                  <p className="font-medium">{profile?.city?.name || "—"}</p>
                 </div>
               </div>
             </Card>
@@ -363,7 +470,73 @@ export default function AccountPage() {
         )}
       </div>
 
-      {/* MODAL */}
+      {/* EDIT PROFILE MODAL */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white w-[95%] md:w-[500px] rounded-2xl p-6 shadow-xl space-y-4">
+
+            <h2 className="text-lg font-semibold text-emerald-900">
+              Edit Profile
+            </h2>
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Full Name"
+              value={editForm.full_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, full_name: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Phone Number"
+              value={editForm.phone_number}
+              onChange={(e) =>
+                setEditForm({ ...editForm, phone_number: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="Default Address"
+              value={editForm.default_address}
+              onChange={(e) =>
+                setEditForm({ ...editForm, default_address: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full border rounded-lg p-2"
+              placeholder="City"
+              value={editForm.city_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, city_name: e.target.value })
+              }
+            />
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "Done"}
+              </button>
+
+              <button
+                onClick={() => setIsEditing(false)}
+                className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* REVIEW MODAL */}
       {showReviewModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">

@@ -117,6 +117,24 @@ export default function AssignedDeliveries() {
                 </span>
               </div>
 
+              {/* 🔥 DELIVERY PRICING SUMMARY (NEW) */}
+              <div className="flex flex-wrap gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm bg-emerald-50/50 rounded-xl p-3 sm:p-4">
+                <span className="font-medium text-gray-700">Delivery Fee:</span>
+                <span className="text-emerald-700 font-semibold">
+                  ${(d.delivery_price || 0).toFixed(2)}
+                </span>
+                <span className="text-gray-300">|</span>
+                <span className="font-medium text-gray-700">Est. Delivery:</span>
+                <span className="text-gray-800">
+                  {d.estimated_delivery_days || 0} day(s)
+                </span>
+                <span className="text-gray-300">|</span>
+                <span className="font-medium text-gray-700">Distance:</span>
+                <span className="text-gray-800">
+                  {(d.distance_km || 0).toFixed(1)} km
+                </span>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-5 text-sm">
                 <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
                   <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1 sm:mb-2">
