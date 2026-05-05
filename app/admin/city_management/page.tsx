@@ -43,7 +43,7 @@ export default function AdminCitiesPage() {
       setLoading(true);
       const [requestsData, citiesData] = await Promise.all([
         fetchWithAuth("/admin/cities/requests"),
-        fetchWithAuth("/cities/"),
+        fetchWithAuth("/admin/cities"), // ✅ FIXED: changed from "/cities/" to "/admin/cities"
       ]);
       setRequests(requestsData);
       setApprovedCities(citiesData);
