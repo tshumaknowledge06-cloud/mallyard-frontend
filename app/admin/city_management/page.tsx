@@ -43,7 +43,7 @@ export default function AdminCitiesPage() {
       setLoading(true);
       const [requestsData, citiesData] = await Promise.all([
         fetchWithAuth("/admin/cities/requests"),
-        fetchWithAuth("/admin/cities"), // ✅ FIXED: changed from "/cities/" to "/admin/cities"
+        fetchWithAuth("/admin/cities"),
       ]);
       setRequests(requestsData);
       setApprovedCities(citiesData);
@@ -273,7 +273,15 @@ export default function AdminCitiesPage() {
                   <span className="text-emerald-500 text-sm">✓</span>
                 </div>
                 <div className="mt-3 text-xs text-gray-400">
-                  <p>📍 {city.latitude.toFixed(4)}, {city.longitude.toFixed(4)}</p>
+                  {/* ✅ FIXED: Added null check for latitude and longitude */}
+                  <p>
+                    📍 {city.latitude !== null && city.latitude !== undefined 
+                      ? city.latitude.toFixed(4) 
+                      : "—"},{" "}
+                    {city.longitude !== null && city.longitude !== undefined 
+                      ? city.longitude.toFixed(4) 
+                      : "—"}
+                  </p>
                 </div>
               </div>
             ))}

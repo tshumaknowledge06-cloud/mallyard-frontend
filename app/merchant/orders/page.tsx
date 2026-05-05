@@ -256,6 +256,18 @@ export default function MerchantOrders() {
     return <p>Loading orders...</p>;
   }
 
+  // 🔥 Helper function to safely format price values
+  const formatPrice = (value: number | null | undefined, currency: string = "USD"): string => {
+    if (value == null) return "-";
+    return `${currency} ${value.toFixed(2)}`;
+  };
+
+  // 🔥 Helper function to safely format delivery fee
+  const formatDeliveryFee = (value: number | null | undefined): string => {
+    if (value == null) return "-";
+    return `$${value.toFixed(2)}`;
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-0">
       <h1 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
@@ -283,6 +295,11 @@ export default function MerchantOrders() {
 
           const alreadySubmitted = pickupSubmitted[o.id] === true;
 
+          // 🔥 Safely calculate total price
+          const totalPrice = listing && o.quantity 
+            ? listing.price * o.quantity 
+            : null;
+
           return (
             <div
               key={o.id}
@@ -302,15 +319,15 @@ export default function MerchantOrders() {
                       Quantity: {o.quantity ?? "-"}
                     </p>
 
-                    {/* TOTAL */}
+                    {/* TOTAL - ✅ Fixed: added null check */}
                     <p className="text-xs sm:text-sm font-medium text-emerald-700">
-                      Total: {listing ? `${(listing.price * (o.quantity || 0)).toFixed(2)} ${listing.currency}` : "-"}
+                      Total: {totalPrice !== null ? formatPrice(totalPrice, listing?.currency) : "-"}
                     </p>
 
-                    {/* 🔥 DELIVERY PRICE (NEW) */}
-                    {isDeliveryOrder && o.delivery_price !== undefined && (
+                    {/* 🔥 DELIVERY PRICE - ✅ Fixed: added null check */}
+                    {isDeliveryOrder && (
                       <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                        Delivery Fee: ${o.delivery_price.toFixed(2)}
+                        Delivery Fee: {formatDeliveryFee(o.delivery_price)}
                       </p>
                     )}
 
