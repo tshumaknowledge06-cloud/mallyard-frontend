@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role: "user" | "sandy";
@@ -145,13 +146,30 @@ export default function SandyChat() {
 
               <div
                 key={index}
-                className={`p-2 rounded-md max-w-[80%] ${
+                className={`p-2 rounded-md max-w-[80%] break-words whitespace-pre-wrap overflow-wrap-anywhere ${
                   msg.role === "user"
                     ? "bg-emerald-100 ml-auto"
                     : "bg-gray-100"
                 }`}
               >
-                {msg.text}
+                {msg.role === "user" ? (
+                  msg.text
+                ) : (
+                  <ReactMarkdown
+                    components={{
+                      a: ({ node, ...props }) => (
+                        <a
+                          {...props}
+                          className="text-emerald-700 underline hover:text-emerald-800 transition"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      ),
+                    }}
+                  >
+                    {msg.text}
+                  </ReactMarkdown>
+                )}
               </div>
 
             ))}
