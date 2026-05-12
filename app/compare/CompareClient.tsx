@@ -17,6 +17,7 @@ interface Merchant {
 interface Listing {
   id: number;
   name: string;
+  description: string;
   price: number;
   currency: string;
   listing_type: string;
@@ -36,6 +37,10 @@ export default function ComparePage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // 🔥 STATE FOR DESCRIPTION MODAL
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDescription, setSelectedDescription] = useState("");
 
   useEffect(() => {
   if (!baseId && !idsParam) {
@@ -110,6 +115,19 @@ export default function ComparePage() {
     }
 
     window.location.href = `/compare?ids=${selected.join(",")}`;
+  };
+
+  // 🔥 Helper function to truncate description
+  const truncateDescription = (text: string, maxLength: number = 80) => {
+    if (!text) return "—";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
+  // 🔥 Open modal with full description
+  const openDescriptionModal = (description: string) => {
+    setSelectedDescription(description);
+    setModalOpen(true);
   };
 
   if (!baseId && !idsParam) {
@@ -281,42 +299,92 @@ export default function ComparePage() {
             ))}
            </tr>
 
+          {/* 📝 DESCRIPTION (NEW ROW) - with truncation and modal */}
+          <tr className="border-t">
+            <td className="p-2 md:p-3 font-medium">Description</td>
+            {listings.map(l => {
+              const truncated = truncateDescription(l.description, 80);
+              const needsModal = l.description && l.description.length > 80;
+              
+              return (
+                <td key={l.id} className="p-2 md:p-3 text-sm md:text-base text-gray-600">
+                  {!l.description ? "—" : (
+                    <>
+                      {truncated}
+                      {needsModal && (
+                        <button
+                          onClick={() => openDescriptionModal(l.description)}
+                          className="ml-1 text-emerald-600 hover:text-emerald-800 text-xs underline"
+                        >
+                          Read more
+                        </button>
+                      )}
+                    </>
+                  )}
+                </td>
+              );
+            })}
+           </tr>
+
           {/* 🏪 MERCHANT */}
           <tr className="border-t">
             <td className="p-2 md:p-3 font-medium">Merchant</td>
-
             {listings.map(l => (
               <td key={l.id} className="p-2 md:p-3 text-sm md:text-base">
                 {l.merchant.business_name.length > 25 ? `${l.merchant.business_name.substring(0, 25)}...` : l.merchant.business_name}
-                </td>
+               </td>
             ))}
            </tr>
 
           {/* 📍 LOCATION */}
           <tr className="border-t">
             <td className="p-2 md:p-3 font-medium">Location</td>
-
             {listings.map(l => (
               <td key={l.id} className="p-2 md:p-3 text-sm md:text-base">
                 {l.merchant.location}
-                </td>
+               </td>
             ))}
            </tr>
 
           {/* 🧾 TYPE */}
           <tr className="border-t">
             <td className="p-2 md:p-3 font-medium">Type</td>
-
             {listings.map(l => (
               <td key={l.id} className="p-2 md:p-3 capitalize text-sm md:text-base">
                 {l.listing_type}
-                </td>
+               </td>
             ))}
            </tr>
 
         </tbody>
 
        </table>
+
+      {/* 🔥 DESCRIPTION MODAL */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Full Description</h2>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-gray-700 text-sm leading-relaxed break-words">
+              {selectedDescription}
+            </p>
+            <button
+              onClick={() => setModalOpen(false)}
+              className="w-full mt-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
