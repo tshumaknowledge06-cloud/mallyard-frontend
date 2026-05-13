@@ -303,8 +303,8 @@ export default function ComparePage() {
           <tr className="border-t">
             <td className="p-2 md:p-3 font-medium">Description</td>
             {listings.map(l => {
-              const truncated = truncateDescription(l.description, 80);
-              const needsModal = l.description && l.description.length > 80;
+              const truncated = truncateDescription(l.description, 15);
+              const needsModal = l.description && l.description.length > 15;
               
               return (
                 <td key={l.id} className="p-2 md:p-3 text-sm md:text-base text-gray-600">
