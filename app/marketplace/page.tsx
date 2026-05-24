@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 import ListingCard from "@/components/marketplace/ListingCard";
 import CategoryFilter from "@/components/marketplace/CategoryFilter";
@@ -8,6 +9,7 @@ import CategoryFilter from "@/components/marketplace/CategoryFilter";
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyState from "@/components/ui/EmptyState";
 import { fetchPublic, fetchWithAuth } from "@/lib/api";
+import { getMediaUrl } from "@/lib/getMediaUrl";
 
 /* ================= TYPES ================= */
 
@@ -36,6 +38,12 @@ interface Listing {
   };
 }
 
+interface FeaturedMerchant {
+  id: number;
+  business_name: string;
+  logo_url?: string;
+}
+
 /* ================= PAGE ================= */
 
 export default function MarketplacePage() {
@@ -46,8 +54,11 @@ export default function MarketplacePage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   
-  // 🔥 NEW: Product/Service filter state - default to "service"
+  // 🔥 Product/Service filter state - default to "service"
   const [listingTypeFilter, setListingTypeFilter] = useState<"product" | "service">("service");
+  
+  // 🔥 Featured Merchants state
+  const [featuredMerchants, setFeaturedMerchants] = useState<FeaturedMerchant[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState("");
@@ -55,6 +66,7 @@ export default function MarketplacePage() {
 
   const trendingRef = useRef<HTMLDivElement>(null);
   const recentRef = useRef<HTMLDivElement>(null);
+  const featuredRef = useRef<HTMLDivElement>(null);
   
   // 🔥 Store refs for each category row
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -72,35 +84,32 @@ export default function MarketplacePage() {
   };
 
   useEffect(() => {
-  loadLocation();
-  fetchListings();
-  fetchCategories();
-  fetchTrending();
+    loadLocation();
+    fetchListings();
+    fetchCategories();
+    fetchTrending();
+    fetchFeaturedMerchants();
 
-  if (isLoggedIn) fetchRecentlyViewed();
+    if (isLoggedIn) fetchRecentlyViewed();
 
-  const handleStorage = () => {
-    const stored = localStorage.getItem("selectedLocation") || "";
+    const handleStorage = () => {
+      const stored = localStorage.getItem("selectedLocation") || "";
+      setLocation(stored);
+      setRefreshKey(prev => prev + 1);
+    };
 
-    setLocation(stored);
+    window.addEventListener("locationChanged", handleStorage);
+    window.addEventListener("storage", handleStorage);
 
-    // 🔥 trigger refresh
-    setRefreshKey(prev => prev + 1);
-  };
+    return () => {
+      window.removeEventListener("locationChanged", handleStorage);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
 
-  window.addEventListener("locationChanged", handleStorage);
-  window.addEventListener("storage", handleStorage);
-
-  return () => {
-    window.removeEventListener("locationChanged", handleStorage);
-    window.removeEventListener("storage", handleStorage);
-  };
-
-}, []);
-
-useEffect(() => {
-  fetchListings();
-}, [refreshKey]);
+  useEffect(() => {
+    fetchListings();
+  }, [refreshKey]);
 
   /* ================= NORMALIZER ================= */
 
@@ -138,7 +147,6 @@ useEffect(() => {
 
   const fetchTrending = async () => {
     try {
-      // 🔥 EXTENDED: Request more trending items (limit=50)
       const data = await fetchPublic("/trending/?limit=50");
       setTrending((data || []).map(normalizeListing));
     } catch {
@@ -146,9 +154,18 @@ useEffect(() => {
     }
   };
 
+  const fetchFeaturedMerchants = async () => {
+    try {
+      // Fetch all approved merchants from your existing endpoint
+      const data = await fetchPublic("/merchants/");
+      setFeaturedMerchants(data || []);
+    } catch {
+      setFeaturedMerchants([]);
+    }
+  };
+
   const fetchRecentlyViewed = async () => {
     try {
-      // 🔥 EXTENDED: Request more recently viewed items (limit=50)
       const data = await fetchWithAuth("/recently-viewed/?limit=50");
 
       const normalized = (data || []).map((item: any) =>
@@ -207,16 +224,14 @@ useEffect(() => {
 
   /* ================= FILTER ================= */
 
-  // 🔥 Combined filtering logic (category + listing_type)
+  // Combined filtering logic (category + listing_type)
   const filteredListings = listings.filter((l) => {
-    // Category filter
     if (selectedCategory && l.subcategory.category_id !== selectedCategory) return false;
-    // Product/Service filter
     if (listingTypeFilter && l.listing_type !== listingTypeFilter) return false;
     return true;
   });
 
-  // 🔥 Group filtered listings by category name
+  // Group filtered listings by category name
   const groupedListings = filteredListings.reduce((acc, listing) => {
     const categoryName = listing.subcategory?.name || "Uncategorized";
     if (!acc[categoryName]) {
@@ -225,6 +240,10 @@ useEffect(() => {
     acc[categoryName].push(listing);
     return acc;
   }, {} as Record<string, Listing[]>);
+
+  // 🔥 Split trending into products and services
+  const trendingProducts = trending.filter(item => item.listing_type === "product");
+  const trendingServices = trending.filter(item => item.listing_type === "service");
 
   /* ================= SCROLL ================= */
 
@@ -240,7 +259,7 @@ useEffect(() => {
     });
   };
 
-  // 🔥 Category-specific scroll handler
+  // Category-specific scroll handler
   const scrollCategory = (categoryName: string, dir: "left" | "right") => {
     const ref = { current: categoryRefs.current[categoryName] };
     scroll(ref, dir);
@@ -259,11 +278,31 @@ useEffect(() => {
         </p>
       </div>
 
-      {/* TRENDING */}
-      {trending.length > 0 && (
+      {/* 🔥 FEATURED MERCHANTS (NEW SECTION - TOP) */}
+      {featuredMerchants.length > 0 && (
+        <MerchantCarousel
+          title="🏪 Featured Merchants"
+          merchants={featuredMerchants}
+          scrollRef={featuredRef}
+          onScroll={scroll}
+        />
+      )}
+
+      {/* 🔥 TRENDING PRODUCTS */}
+      {trendingProducts.length > 0 && (
         <SectionCarousel
-          title="🔥 Trending"
-          listings={trending}
+          title="📦 Trending Products"
+          listings={trendingProducts}
+          scrollRef={trendingRef}
+          onScroll={scroll}
+        />
+      )}
+
+      {/* 🔥 POPULAR SERVICES */}
+      {trendingServices.length > 0 && (
+        <SectionCarousel
+          title="⚡ Popular Services"
+          listings={trendingServices}
           scrollRef={trendingRef}
           onScroll={scroll}
         />
@@ -295,7 +334,7 @@ useEffect(() => {
         </div>
       )}
 
-      {/* 🔥 FILTERS ROW: Category Filter + Product/Service Toggle (tight gap) */}
+      {/* 🔥 FILTERS ROW: Category Filter + Product/Service Toggle */}
       <div className="flex flex-wrap items-center gap-2">
         <CategoryFilter
           categories={categories}
@@ -340,7 +379,7 @@ useEffect(() => {
         />
       )}
 
-      {/* 🔥 Category-based horizontal rows (same behavior as Trending) */}
+      {/* 🔥 Category-based horizontal rows */}
       {!loading && filteredListings.length > 0 && (
         <div className="space-y-10">
           {Object.entries(groupedListings).map(([categoryName, categoryListings]) => (
@@ -400,6 +439,90 @@ useEffect(() => {
   );
 }
 
+/* ================= MERCHANT CAROUSEL (NEW) ================= */
+
+function MerchantCarousel({
+  title,
+  merchants,
+  scrollRef,
+  onScroll,
+}: {
+  title: string;
+  merchants: FeaturedMerchant[];
+  scrollRef: React.RefObject<HTMLDivElement | null>;
+  onScroll: (
+    ref: React.RefObject<HTMLDivElement | null>,
+    dir: "left" | "right"
+  ) => void;
+}) {
+
+  return (
+    <div className="space-y-4">
+
+      <h2 className="text-xl font-semibold text-[#D4AF37]">
+        {title}
+      </h2>
+
+      <div className="relative group overflow-hidden">
+
+        <button
+          onClick={() => onScroll(scrollRef, "left")}
+          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100 transition"
+        >
+          ‹
+        </button>
+
+        <button
+          onClick={() => onScroll(scrollRef, "right")}
+          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100 transition"
+        >
+          ›
+        </button>
+
+        <div
+          ref={scrollRef}
+          className="flex gap-5 overflow-x-auto scroll-smooth no-scrollbar"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
+          {merchants.map((merchant) => (
+            <Link
+              key={merchant.id}
+              href={`/store/${merchant.id}`}
+              className="min-w-[160px] sm:min-w-[180px] max-w-[180px] flex-shrink-0 group/merchant"
+            >
+              <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all duration-200 text-center">
+                <div className="w-20 h-20 mx-auto rounded-full overflow-hidden bg-gray-100 mb-3">
+                  {merchant.logo_url ? (
+                    <img
+                      src={getMediaUrl(merchant.logo_url)}
+                      className="w-full h-full object-cover"
+                      alt={merchant.business_name}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-emerald-100 to-emerald-50">
+                      🏪
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-semibold text-gray-800 text-sm line-clamp-2">
+                  {merchant.business_name}
+                </h3>
+                <p className="text-[10px] text-emerald-600 mt-1 opacity-0 group-hover/merchant:opacity-100 transition">
+                  Visit Store →
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 /* ================= CAROUSEL ================= */
 
 function SectionCarousel({
@@ -417,25 +540,36 @@ function SectionCarousel({
   ) => void;
 }) {
 
+  // Extract emoji or icon from title
+  const getTitlePrefix = (title: string) => {
+    if (title.includes("Trending Products")) return "📦";
+    if (title.includes("Popular Services")) return "⚡";
+    if (title.includes("Recently Viewed")) return "👁️";
+    return "✨";
+  };
+
+  const prefix = getTitlePrefix(title);
+  const displayTitle = title.replace(/^[^\s]+\s/, "");
+
   return (
     <div className="space-y-4">
 
-      <h2 className="text-xl font-semibold text-emerald-700">
-        {title}
+      <h2 className="text-xl font-semibold text-[#D4AF37]">
+        {prefix} {displayTitle}
       </h2>
 
       <div className="relative group overflow-hidden">
 
         <button
           onClick={() => onScroll(scrollRef, "left")}
-          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100"
+          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100 transition"
         >
           ‹
         </button>
 
         <button
           onClick={() => onScroll(scrollRef, "right")}
-          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100"
+          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full px-3 py-2 opacity-0 group-hover:opacity-100 transition"
         >
           ›
         </button>
