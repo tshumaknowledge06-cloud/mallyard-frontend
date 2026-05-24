@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Store, Package, Zap, Eye } from "lucide-react";
 
 import ListingCard from "@/components/marketplace/ListingCard";
 import CategoryFilter from "@/components/marketplace/CategoryFilter";
@@ -156,8 +157,8 @@ export default function MarketplacePage() {
 
   const fetchFeaturedMerchants = async () => {
     try {
-      // Fetch all approved merchants from your existing endpoint
-      const data = await fetchPublic("/merchants/");
+      // ✅ FIXED: Using the new /merchants/approved endpoint
+      const data = await fetchPublic("/merchants/approved");
       setFeaturedMerchants(data || []);
     } catch {
       setFeaturedMerchants([]);
@@ -265,6 +266,16 @@ export default function MarketplacePage() {
     scroll(ref, dir);
   };
 
+  // 🔥 Glassy emerald box styling for section titles
+  const SectionTitle = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
+    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
+      <Icon className="w-4 h-4 text-emerald-700" />
+      <h2 className="text-base md:text-lg font-semibold text-emerald-800">
+        {title}
+      </h2>
+    </div>
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 space-y-12">
 
@@ -281,7 +292,7 @@ export default function MarketplacePage() {
       {/* 🔥 FEATURED MERCHANTS (NEW SECTION - TOP) */}
       {featuredMerchants.length > 0 && (
         <MerchantCarousel
-          title="🏪 Featured Merchants"
+          title="Featured Merchants"
           merchants={featuredMerchants}
           scrollRef={featuredRef}
           onScroll={scroll}
@@ -291,40 +302,45 @@ export default function MarketplacePage() {
       {/* 🔥 TRENDING PRODUCTS */}
       {trendingProducts.length > 0 && (
         <SectionCarousel
-          title="📦 Trending Products"
+          title="Trending Products"
           listings={trendingProducts}
           scrollRef={trendingRef}
           onScroll={scroll}
+          icon={Package}
         />
       )}
 
       {/* 🔥 POPULAR SERVICES */}
       {trendingServices.length > 0 && (
         <SectionCarousel
-          title="⚡ Popular Services"
+          title="Popular Services"
           listings={trendingServices}
           scrollRef={trendingRef}
           onScroll={scroll}
+          icon={Zap}
         />
       )}
 
       {/* RECENTLY VIEWED */}
       {isLoggedIn && recentlyViewed.length > 0 && (
         <SectionCarousel
-          title="👁️ Recently Viewed"
+          title="Recently Viewed"
           listings={recentlyViewed}
           scrollRef={recentRef}
           onScroll={scroll}
+          icon={Eye}
         />
       )}
 
       {/* LOCATION WITH EXIT LINK */}
       {location && (
         <div className="flex items-center gap-2">
-          <p className="text-sm text-gray-500">
-            Showing in{" "}
-            <span className="font-semibold">{location}</span>
-          </p>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
+            <span className="text-sm text-emerald-700">📍</span>
+            <span className="text-sm font-medium text-emerald-800">
+              Showing in {location}
+            </span>
+          </div>
           <button
             onClick={clearLocationFilter}
             className="text-sm text-blue-600 underline hover:text-blue-800 transition"
@@ -385,9 +401,12 @@ export default function MarketplacePage() {
           {Object.entries(groupedListings).map(([categoryName, categoryListings]) => (
             <div key={categoryName} className="space-y-4">
               
-              <h2 className="text-xl font-semibold text-emerald-700">
-                {categoryName}
-              </h2>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
+                <span className="text-sm text-emerald-700">📂</span>
+                <h2 className="text-base md:text-lg font-semibold text-emerald-800">
+                  {categoryName}
+                </h2>
+              </div>
 
               <div className="relative group overflow-hidden">
                 <button
@@ -439,7 +458,7 @@ export default function MarketplacePage() {
   );
 }
 
-/* ================= MERCHANT CAROUSEL (NEW) ================= */
+/* ================= MERCHANT CAROUSEL ================= */
 
 function MerchantCarousel({
   title,
@@ -459,9 +478,12 @@ function MerchantCarousel({
   return (
     <div className="space-y-4">
 
-      <h2 className="text-xl font-semibold text-[#D4AF37]">
-        {title}
-      </h2>
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
+        <Store className="w-4 h-4 text-emerald-700" />
+        <h2 className="text-base md:text-lg font-semibold text-emerald-800">
+          {title}
+        </h2>
+      </div>
 
       <div className="relative group overflow-hidden">
 
@@ -530,6 +552,7 @@ function SectionCarousel({
   listings,
   scrollRef,
   onScroll,
+  icon: Icon,
 }: {
   title: string;
   listings: Listing[];
@@ -538,25 +561,18 @@ function SectionCarousel({
     ref: React.RefObject<HTMLDivElement | null>,
     dir: "left" | "right"
   ) => void;
+  icon: React.ElementType;
 }) {
-
-  // Extract emoji or icon from title
-  const getTitlePrefix = (title: string) => {
-    if (title.includes("Trending Products")) return "📦";
-    if (title.includes("Popular Services")) return "⚡";
-    if (title.includes("Recently Viewed")) return "👁️";
-    return "✨";
-  };
-
-  const prefix = getTitlePrefix(title);
-  const displayTitle = title.replace(/^[^\s]+\s/, "");
 
   return (
     <div className="space-y-4">
 
-      <h2 className="text-xl font-semibold text-[#D4AF37]">
-        {prefix} {displayTitle}
-      </h2>
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
+        <Icon className="w-4 h-4 text-emerald-700" />
+        <h2 className="text-base md:text-lg font-semibold text-emerald-800">
+          {title}
+        </h2>
+      </div>
 
       <div className="relative group overflow-hidden">
 
