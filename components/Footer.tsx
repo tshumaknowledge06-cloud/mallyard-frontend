@@ -69,7 +69,7 @@ export default function Footer() {
 
             <li>
               <a
-                href="https://instagram.com/themallyard"
+                href="https://instagram.com/the.mallyard"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition"
