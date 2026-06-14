@@ -401,8 +401,8 @@ export default function MarketplacePage() {
           {Object.entries(groupedListings).map(([categoryName, categoryListings]) => (
             <div key={categoryName} className="space-y-4">
               
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
-                <span className="text-sm text-emerald-700">📂</span>
+              {/* ✅ FIXED: Removed the yellow file icon, only glassy emerald box remains */}
+              <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-emerald-50/40 backdrop-blur-sm border border-emerald-200/50 shadow-sm">
                 <h2 className="text-base md:text-lg font-semibold text-emerald-800">
                   {categoryName}
                 </h2>
