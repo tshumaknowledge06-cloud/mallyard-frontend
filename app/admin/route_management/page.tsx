@@ -147,6 +147,7 @@ export default function AdminRouteManagement() {
     }
   }
 
+  // 🔥 UPDATED: Use PUT endpoint with query params
   async function handleAddPricing() {
     if (!selectedRoute) return;
 
@@ -158,42 +159,24 @@ export default function AdminRouteManagement() {
     try {
       setAddingPricing(true);
 
-      const pricingPromises = [];
-      if (smallPrice) {
-        pricingPromises.push(
-          fetchWithAuth(`/admin/routes/${selectedRoute.id}/pricing`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ package_type: "small", base_price: parseFloat(smallPrice) }),
-          })
-        );
-      }
-      if (mediumPrice) {
-        pricingPromises.push(
-          fetchWithAuth(`/admin/routes/${selectedRoute.id}/pricing`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ package_type: "medium", base_price: parseFloat(mediumPrice) }),
-          })
-        );
-      }
-      if (largePrice) {
-        pricingPromises.push(
-          fetchWithAuth(`/admin/routes/${selectedRoute.id}/pricing`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ package_type: "large", base_price: parseFloat(largePrice) }),
-          })
-        );
-      }
+      // ✅ Build query params
+      const params = new URLSearchParams();
+      if (smallPrice) params.append("small", smallPrice);
+      if (mediumPrice) params.append("medium", mediumPrice);
+      if (largePrice) params.append("large", largePrice);
 
-      await Promise.all(pricingPromises);
+      await fetchWithAuth(
+        `/admin/routes/${selectedRoute.id}/pricing?${params.toString()}`,
+        {
+          method: "PUT",
+        }
+      );
 
       setShowPricingModal(false);
       resetPricingForm();
       await loadData();
     } catch {
-      alert("Failed to add pricing");
+      alert("Failed to update pricing");
     } finally {
       setAddingPricing(false);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { fetchWithAuth } from "@/lib/api";
 import { getMediaUrl } from "@/lib/getMediaUrl";
 
@@ -37,10 +37,28 @@ export default function ListingsPage() {
 
   const [mediaIndex, setMediaIndex] = useState<Record<number, number>>({});
 
+  // 🔥 NEW: State for success notification
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [newListingId, setNewListingId] = useState<number | null>(null);
+  const newListingRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     loadListings();
     loadSubcategories();
   }, []);
+
+  // 🔥 NEW: Auto-scroll to new listing when it appears
+  useEffect(() => {
+    if (newListingId && newListingRef.current) {
+      setTimeout(() => {
+        newListingRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 300);
+    }
+  }, [listings, newListingId]);
 
   async function loadListings() {
     try {
@@ -106,10 +124,82 @@ export default function ListingsPage() {
     }));
   }
 
+  // 🔥 NEW: Handle create listing with success feedback
+  async function handleCreateListing() {
+    if (!form.name || !form.subcategory_id) {
+      alert("Please select subcategory");
+      return;
+    }
+
+    try {
+      const response = await fetchWithAuth("/listings/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form)
+      });
+
+      // ✅ Store the new listing ID for auto-scroll
+      if (response && response.id) {
+        setNewListingId(response.id);
+      }
+
+      setSuccessMessage("✅ Listing Created! Now add images and a video to make it stand out. (Max 5MB per image)");
+      setShowSuccess(true);
+      
+      // Hide success after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
+      
+      await loadListings();
+      
+      // Reset form
+      setForm({
+        name: "",
+        description: "",
+        price: 0,
+        currency: "USD",
+        listing_type: "product",
+        stock_quantity: 0,
+        service_duration_minutes: 0,
+        subcategory_id: 0
+      });
+      
+    } catch {
+      alert("Failed to create listing");
+    }
+  }
+
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-10 space-y-10">
+      
+      {/* 🔥 NEW: Golden Tip Bar */}
+      <div className="bg-gradient-to-r from-yellow-50/80 via-yellow-100/50 to-yellow-50/80 backdrop-blur-sm border border-yellow-200/50 rounded-xl p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <span className="text-yellow-500 text-xl mt-0.5">💡</span>
+          <div>
+            <p className="text-sm font-semibold text-yellow-700">
+              Pro Tip:
+            </p>
+            <p className="text-sm text-yellow-700/90">
+              Fill your product or service details clearly, then add high-quality images (max 5MB each) and one video per listing. Clear, transparent information builds trust and helps customers choose you.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 🔥 NEW: Success Notification */}
+      {showSuccess && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-start gap-3">
+            <span className="text-emerald-500 text-xl">✅</span>
+            <p className="text-sm text-emerald-700">
+              {successMessage}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* CREATE */}
       <div className="bg-white/80 backdrop-blur border rounded-2xl shadow-md p-6 space-y-4">
         <h2 className="text-lg font-semibold text-emerald-900">
@@ -208,21 +298,8 @@ export default function ListingsPage() {
         </select>
 
         <button
-          onClick={async () => {
-            if (!form.name || !form.subcategory_id) {
-              alert("Please select subcategory");
-              return;
-            }
-
-            await fetchWithAuth("/listings/", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(form)
-            });
-
-            loadListings();
-          }}
-          className="w-full bg-emerald-600 text-white py-2 rounded-lg"
+          onClick={handleCreateListing}
+          className="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition"
         >
           Create Listing
         </button>
@@ -230,19 +307,27 @@ export default function ListingsPage() {
 
       {/* GRID */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        {listings.map(l => {
+        {listings.map((l, index) => {
           const media = [
             ...(l.image_urls || []),
             ...(l.video_url ? [l.video_url] : [])
           ];
 
-          const index = mediaIndex[l.id] || 0;
-          const current = media[index];
+          const indexMedia = mediaIndex[l.id] || 0;
+          const current = media[indexMedia];
+          
+          // 🔥 NEW: Check if this is the newly created listing
+          const isNewListing = l.id === newListingId;
 
           return (
             <div
               key={l.id}
-              className="bg-white rounded-2xl shadow-sm p-3 md:p-4 flex flex-col justify-between h-[380px] md:h-[440px]"
+              ref={isNewListing ? newListingRef : null}
+              className={`
+                bg-white rounded-2xl shadow-sm p-3 md:p-4 flex flex-col justify-between h-[380px] md:h-[440px]
+                transition-all duration-500
+                ${isNewListing ? "ring-2 ring-yellow-400 shadow-lg shadow-yellow-200/50" : ""}
+              `}
             >
               {/* MEDIA */}
               <div

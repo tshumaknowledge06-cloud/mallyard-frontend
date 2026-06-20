@@ -19,6 +19,9 @@ interface AnalyticsResponse {
   active_customers: number;
   orders_per_week: OrdersPerWeekItem[];
   match_success_rate: number;
+  active_bookers: number;        
+  service_bookings: number;      
+  total_users: number;           
 }
 
 export default function AdminAnalyticsPage() {
@@ -96,7 +99,8 @@ export default function AdminAnalyticsPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* 🔥 UPDATED: 6 cards in a 3-column grid on desktop, 2 columns on tablet, 1 on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="p-5">
           <p className="text-sm text-gray-500">
             Active Customers
@@ -111,6 +115,36 @@ export default function AdminAnalyticsPage() {
           </p>
         </Card>
 
+        {/* 🔥 NEW: Active Bookers */}
+        <Card className="p-5">
+          <p className="text-sm text-gray-500">
+            Active Bookers
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-gray-900">
+            {data.active_bookers}
+          </p>
+
+          <p className="mt-2 text-xs text-gray-500">
+            Users who booked services in the last 30 days
+          </p>
+        </Card>
+
+        {/* 🔥 NEW: Service Bookings */}
+        <Card className="p-5">
+          <p className="text-sm text-gray-500">
+            Service Bookings
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-gray-900">
+            {data.service_bookings}
+          </p>
+
+          <p className="mt-2 text-xs text-gray-500">
+            Total service bookings in the last 30 days
+          </p>
+        </Card>
+
         <Card className="p-5">
           <p className="text-sm text-gray-500">
             Match Success Rate
@@ -122,6 +156,21 @@ export default function AdminAnalyticsPage() {
 
           <p className="mt-2 text-xs text-gray-500">
             Delivery requests successfully matched to delivery partners
+          </p>
+        </Card>
+
+        {/* 🔥 NEW: Total Users */}
+        <Card className="p-5">
+          <p className="text-sm text-gray-500">
+            Total Users
+          </p>
+
+          <p className="mt-2 text-3xl font-bold text-gray-900">
+            {data.total_users}
+          </p>
+
+          <p className="mt-2 text-xs text-gray-500">
+            Total registered accounts on the platform
           </p>
         </Card>
 
