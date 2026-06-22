@@ -37,10 +37,11 @@ export default function ListingsPage() {
 
   const [mediaIndex, setMediaIndex] = useState<Record<number, number>>({});
 
-  // 🔥 NEW: State for success notification
+  // 🔥 State for success notification
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [newListingId, setNewListingId] = useState<number | null>(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
   const newListingRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -48,17 +49,19 @@ export default function ListingsPage() {
     loadSubcategories();
   }, []);
 
-  // 🔥 NEW: Auto-scroll to new listing when it appears
+  // 🔥 Auto-scroll to new listing AFTER toast disappears
   useEffect(() => {
-    if (newListingId && newListingRef.current) {
+    if (shouldScroll && newListingId && newListingRef.current) {
       setTimeout(() => {
         newListingRef.current?.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
+        // Reset scroll flag after scrolling
+        setShouldScroll(false);
       }, 300);
     }
-  }, [listings, newListingId]);
+  }, [shouldScroll, newListingId, listings]);
 
   async function loadListings() {
     try {
@@ -124,7 +127,7 @@ export default function ListingsPage() {
     }));
   }
 
-  // 🔥 NEW: Handle create listing with success feedback
+  // 🔥 Handle create listing with sequential flow
   async function handleCreateListing() {
     if (!form.name || !form.subcategory_id) {
       alert("Please select subcategory");
@@ -138,20 +141,28 @@ export default function ListingsPage() {
         body: JSON.stringify(form)
       });
 
-      // ✅ Store the new listing ID for auto-scroll
+      // ✅ Store the new listing ID
       if (response && response.id) {
         setNewListingId(response.id);
       }
 
+      // ✅ Show toast first
       setSuccessMessage("✅ Listing Created! Now add images and a video to make it stand out. (Max 5MB per image)");
       setShowSuccess(true);
       
-      // Hide success after 5 seconds
-      setTimeout(() => setShowSuccess(false), 5000);
+      // ✅ Wait 4 seconds for toast to be visible
+      await new Promise(resolve => setTimeout(resolve, 4000));
       
+      // ✅ Hide toast
+      setShowSuccess(false);
+      
+      // ✅ Trigger scroll AFTER toast disappears
+      setShouldScroll(true);
+      
+      // ✅ Load listings in background
       await loadListings();
       
-      // Reset form
+      // ✅ Reset form
       setForm({
         name: "",
         description: "",
@@ -173,7 +184,7 @@ export default function ListingsPage() {
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-10 space-y-10">
       
-      {/* 🔥 NEW: Golden Tip Bar */}
+      {/* 🔥 Golden Tip Bar */}
       <div className="bg-gradient-to-r from-yellow-50/80 via-yellow-100/50 to-yellow-50/80 backdrop-blur-sm border border-yellow-200/50 rounded-xl p-4 shadow-sm">
         <div className="flex items-start gap-3">
           <span className="text-yellow-500 text-xl mt-0.5">💡</span>
@@ -188,7 +199,7 @@ export default function ListingsPage() {
         </div>
       </div>
 
-      {/* 🔥 NEW: Success Notification */}
+      {/* 🔥 Success Notification */}
       {showSuccess && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm animate-in slide-in-from-top-2 duration-300">
           <div className="flex items-start gap-3">
@@ -316,7 +327,7 @@ export default function ListingsPage() {
           const indexMedia = mediaIndex[l.id] || 0;
           const current = media[indexMedia];
           
-          // 🔥 NEW: Check if this is the newly created listing
+          // Check if this is the newly created listing
           const isNewListing = l.id === newListingId;
 
           return (
@@ -344,7 +355,6 @@ export default function ListingsPage() {
                   e.target.addEventListener("touchend", handleEnd, { once: true });
                 }}
               >
-                {/* 🔥 FIX: Bulletproof video detection using isVideo() */}
                 {current && isVideo(current)
                   ? <video src={getMediaUrl(current)} className="w-full h-full object-cover" controls />
                   : <img src={getMediaUrl(current)} className="w-full h-full object-cover" />
@@ -448,7 +458,6 @@ export default function ListingsPage() {
                     </button>
                   </div>
 
-                  {/* ✅ KEEP UPLOADERS MOUNTED (NOT HIDDEN) */}
                   <div className="mt-2 space-y-2">
                     <ImageUploader
                       id={`img-upload-${l.id}`}
@@ -525,7 +534,6 @@ export default function ListingsPage() {
                       className="border p-2 w-full rounded"
                     />
 
-                    {/* STOCK QUANTITY (ONLY FOR PRODUCTS) */}
                     {editForm.listing_type === "product" && (
                       <div className="space-y-1">
                         <p className="text-xs font-semibold text-gray-500">Stock Quantity</p>
