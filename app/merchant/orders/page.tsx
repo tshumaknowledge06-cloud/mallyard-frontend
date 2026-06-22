@@ -33,6 +33,7 @@ interface Order {
   customer_phone?: string;
   delivery_price?: number;
   estimated_delivery_days?: number;
+  order_specifications?: string; // 🔥 NEW
   
   listing_id?: number;
   listing_name?: string;
@@ -319,23 +320,35 @@ export default function MerchantOrders() {
                       Quantity: {o.quantity ?? "-"}
                     </p>
 
-                    {/* TOTAL - ✅ Fixed: added null check */}
+                    {/* TOTAL */}
                     <p className="text-xs sm:text-sm font-medium text-emerald-700">
                       Total: {totalPrice !== null ? formatPrice(totalPrice, listing?.currency) : "-"}
                     </p>
 
-                    {/* 🔥 DELIVERY PRICE - ✅ Fixed: added null check */}
+                    {/* 🔥 DELIVERY PRICE */}
                     {isDeliveryOrder && (
                       <p className="text-xs sm:text-sm text-gray-600 mt-1">
                         Delivery Fee: {formatDeliveryFee(o.delivery_price)}
                       </p>
                     )}
 
-                    {/* 🔥 ESTIMATED DELIVERY DAYS (NEW) */}
+                    {/* 🔥 ESTIMATED DELIVERY DAYS */}
                     {isDeliveryOrder && o.estimated_delivery_days !== undefined && (
                       <p className="text-xs sm:text-sm text-gray-600">
                         Est. Delivery: {o.estimated_delivery_days} day(s)
                       </p>
+                    )}
+
+                    {/* 🔥 ORDER SPECIFICATIONS (NEW) */}
+                    {o.order_specifications && (
+                      <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-[10px] font-semibold uppercase text-yellow-700 mb-1">
+                          📋 Order Specifications
+                        </p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                          {o.order_specifications}
+                        </p>
+                      </div>
                     )}
 
                     {/* STATUS */}

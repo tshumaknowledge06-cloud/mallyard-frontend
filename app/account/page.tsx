@@ -22,6 +22,7 @@ interface Order {
   total_price?: number;
   delivery_price?: number;
   estimated_delivery_days?: number;
+  order_specifications?: string; // 🔥 NEW
 }
 
 interface Booking {
@@ -285,6 +286,18 @@ export default function AccountPage() {
               </p>
             )}
           </div>
+
+          {/* 🔥 ORDER SPECIFICATIONS (NEW) */}
+          {item.order_specifications && (
+            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-[10px] font-semibold uppercase text-yellow-700 mb-0.5">
+                📋 Order Specifications
+              </p>
+              <p className="text-xs text-gray-700 whitespace-pre-wrap">
+                {item.order_specifications}
+              </p>
+            </div>
+          )}
 
           <div className="mt-2 flex items-center justify-between">
             <div className={`px-2 py-1 text-[11px] rounded-full ${getStatusColor(item.status)}`}>

@@ -15,6 +15,7 @@ export default function OrderModal({ listingId, onClose }: Props) {
   const [dropoffAddress, setDropoffAddress] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [orderSpecifications, setOrderSpecifications] = useState(""); // 🔥 NEW
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -81,6 +82,7 @@ export default function OrderModal({ listingId, onClose }: Props) {
           delivery_method: deliveryMethod,
           dropoff_address: deliveryMethod === "delivery" ? dropoffAddress : null,
           delivery_instructions: deliveryInstructions || null,
+          order_specifications: orderSpecifications || null, // 🔥 NEW
           customer_phone: customerPhone
         })
       });
@@ -106,6 +108,7 @@ export default function OrderModal({ listingId, onClose }: Props) {
       setDropoffAddress("");
       setDeliveryInstructions("");
       setCustomerPhone("");
+      setOrderSpecifications(""); // 🔥 NEW
 
       setShowSuccessPopup(true);
     } catch {
@@ -195,6 +198,26 @@ export default function OrderModal({ listingId, onClose }: Props) {
             placeholder="Delivery Instructions"
             className="border p-2 w-full rounded"
           />
+
+          {/* 🔥 NEW: ORDER SPECIFICATIONS */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Order Specifications
+              <span className="text-gray-400 text-xs font-normal ml-1">(Optional)</span>
+            </label>
+
+            <textarea
+              value={orderSpecifications}
+              onChange={(e) => setOrderSpecifications(e.target.value)}
+              placeholder="Order Specifications (e.g. Toyota Avensis Rim Size 17, Black Finish)"
+              className="w-full border p-2 rounded-lg text-sm"
+              rows={3}
+            />
+
+            <p className="text-xs text-gray-500">
+              Specify the exact product variation, size, model, color, or requirements you need.
+            </p>
+          </div>
 
           <input
             type="tel"
