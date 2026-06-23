@@ -22,7 +22,7 @@ interface Order {
   total_price?: number;
   delivery_price?: number;
   estimated_delivery_days?: number;
-  order_specifications?: string; // 🔥 NEW
+  order_specifications?: string;
 }
 
 interface Booking {
@@ -268,19 +268,19 @@ export default function AccountPage() {
             <p className="text-xs text-gray-500 line-clamp-1">{merchant?.business_name}</p>
           </div>
 
-          {/* 🔥 PRICE INFORMATION */}
+          {/* 🔥 PRICE INFORMATION - NULL SAFE */}
           <div className="mt-2 space-y-0.5">
-            {item.total_price !== undefined && (
+            {item.total_price != null && (
               <p className="text-xs text-gray-600">
                 Total: {listing?.currency} {item.total_price.toFixed(2)}
               </p>
             )}
-            {isDeliveryOrder && item.delivery_price !== undefined && (
+            {isDeliveryOrder && item.delivery_price != null && (
               <p className="text-xs text-gray-600">
                 Delivery Fee: {listing?.currency} {item.delivery_price.toFixed(2)}
               </p>
             )}
-            {isDeliveryOrder && item.estimated_delivery_days !== undefined && (
+            {isDeliveryOrder && item.estimated_delivery_days != null && (
               <p className="text-xs text-gray-600">
                 Est. Delivery: {item.estimated_delivery_days} day(s)
               </p>
