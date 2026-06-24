@@ -25,10 +25,73 @@ export default function MerchantDashboard() {
     description: "",
     location: "",
     contact_phone: "",
-    pickup_address: "",  // 🔥 NEW
-    city_name: ""        // 🔥 NEW
+    pickup_address: "",
+    city_name: ""
   });
   const [saving, setSaving] = useState(false);
+
+  // 🔥 TIP CAROUSEL STATE
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const carouselIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const tips = [
+    {
+      id: 1,
+      text: "Add at least one listing to your store so customers can order or book you."
+    },
+    {
+      id: 2,
+      text: "Use the top left menu button to navigate and manage your store."
+    },
+    {
+      id: 3,
+      text: "Keep a fast track of orders and bookings. Attend to them quickly and keep momentum high."
+    },
+    {
+      id: 4,
+      text: "You have all order/booking and customer information you need. Just follow the sequence — it's flawless."
+    },
+    {
+      id: 5,
+      text: "Listings with clear photos and descriptions get more attention. Make your store stand out."
+    },
+    {
+      id: 6,
+      text: "Responding quickly to customer inquiries builds trust and increases sales."
+    },
+    {
+      id: 7,
+      text: "A complete store profile (logo, description, contact info) makes you look more professional."
+    }
+  ];
+
+  // 🔥 AUTO-SCROLL TIPS
+  useEffect(() => {
+    if (isPaused) return;
+
+    carouselIntervalRef.current = setInterval(() => {
+      setCurrentTipIndex((prev) => (prev + 1) % tips.length);
+    }, 5000);
+
+    return () => {
+      if (carouselIntervalRef.current) {
+        clearInterval(carouselIntervalRef.current);
+      }
+    };
+  }, [isPaused, tips.length]);
+
+  const goToTip = (index: number) => {
+    setCurrentTipIndex(index);
+  };
+
+  const nextTip = () => {
+    setCurrentTipIndex((prev) => (prev + 1) % tips.length);
+  };
+
+  const prevTip = () => {
+    setCurrentTipIndex((prev) => (prev - 1 + tips.length) % tips.length);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -106,8 +169,8 @@ export default function MerchantDashboard() {
       description: merchant.description || "",
       location: merchant.location || "",
       contact_phone: merchant.contact_phone || "",
-      pickup_address: merchant.pickup_address || "",  // 🔥 NEW
-      city_name: merchant.city?.name || ""           // 🔥 NEW
+      pickup_address: merchant.pickup_address || "",
+      city_name: merchant.city?.name || ""
     });
 
     setIsEditing(true);
@@ -307,6 +370,77 @@ export default function MerchantDashboard() {
          </h2>
         </div>
 
+      </div>
+
+      {/* 🔥 TIP CAROUSEL */}
+      <div 
+        className="bg-gradient-to-r from-emerald-50/60 via-white to-emerald-50/60 rounded-2xl border border-emerald-100/50 shadow-sm p-6 md:p-8"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div className="flex items-start gap-4">
+          {/* LEFT ARROW */}
+          <button
+            onClick={prevTip}
+            className="hidden md:flex mt-1 text-emerald-600 hover:text-emerald-800 transition"
+            aria-label="Previous tip"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* TIP CONTENT */}
+          <div className="flex-1 text-center">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <span className="text-emerald-600 text-sm font-medium">💡 Tip</span>
+              <span className="text-gray-400 text-xs">
+                {currentTipIndex + 1} / {tips.length}
+              </span>
+            </div>
+
+            <p className="text-gray-700 text-base md:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
+              {tips[currentTipIndex].text}
+            </p>
+
+            {/* DOTS */}
+            <div className="flex justify-center gap-2 mt-4">
+              {tips.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToTip(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentTipIndex
+                      ? "w-6 bg-emerald-600"
+                      : "w-2 bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  aria-label={`Go to tip ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT ARROW */}
+          <button
+            onClick={nextTip}
+            className="hidden md:flex mt-1 text-emerald-600 hover:text-emerald-800 transition"
+            aria-label="Next tip"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* ADD LISTINGS BUTTON */}
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => router.push("/merchant/listings")}
+            className="px-8 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg"
+          >
+            + Add Listings
+          </button>
+        </div>
       </div>
 
       {/* 🔥 EDIT PROFILE MODAL */}
