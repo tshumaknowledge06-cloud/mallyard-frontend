@@ -71,7 +71,13 @@ export default function ListingPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // 🔥 FULLSCREEN MEDIA VIEWER STATE
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [fullscreenIndex, setFullscreenIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
   const scrollRef = useRef<HTMLDivElement>(null);
+  const thumbnailScrollRef = useRef<HTMLDivElement>(null);
 
   // 🔥 NEW: State for showing full listing name in modal/popup
   const [showFullNameModal, setShowFullNameModal] = useState(false);
@@ -214,6 +220,51 @@ export default function ListingPage() {
     });
   };
 
+  // 🔥 FULLSCREEN MEDIA FUNCTIONS
+  const openFullscreen = (index: number) => {
+    setFullscreenIndex(index);
+    setFullscreenOpen(true);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenOpen(false);
+    document.body.style.overflow = "auto";
+  };
+
+  const goToPrev = () => {
+    setFullscreenIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setFullscreenIndex((prev) => (prev + 1) % media.length);
+  };
+
+  // 🔥 Touch swipe handlers for fullscreen
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (diff > 50) goToNext();
+    if (diff < -50) goToPrev();
+    setTouchStartX(null);
+  };
+
+  // 🔥 Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!fullscreenOpen) return;
+      if (e.key === "Escape") closeFullscreen();
+      if (e.key === "ArrowLeft") goToPrev();
+      if (e.key === "ArrowRight") goToNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [fullscreenOpen]);
+
   const media = [
     ...(listing?.image_urls || []).map((img) => ({
       type: "image",
@@ -229,6 +280,94 @@ export default function ListingPage() {
 
   return (
     <div className="w-full">
+
+      {/* 🔥 FULLSCREEN MEDIA VIEWER */}
+      {fullscreenOpen && media.length > 0 && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 flex flex-col"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* CLOSE BUTTON */}
+          <button
+            onClick={closeFullscreen}
+            className="absolute top-4 right-4 z-10 text-white/80 hover:text-white text-2xl p-2"
+          >
+            ✕
+          </button>
+
+          {/* MAIN MEDIA (75% of screen) */}
+          <div className="flex-1 flex items-center justify-center p-4 relative h-[75vh]">
+            {media[fullscreenIndex].type === "image" ? (
+              <img
+                src={media[fullscreenIndex].src}
+                className="max-w-full max-h-full object-contain"
+                alt="Fullscreen media"
+              />
+            ) : (
+              <video
+                src={media[fullscreenIndex].src}
+                className="max-w-full max-h-full object-contain"
+                controls
+                autoPlay
+              />
+            )}
+
+            {/* Navigation Arrows - Only if more than 1 media */}
+            {media.length > 1 && (
+              <>
+                <button
+                  onClick={goToPrev}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={goToNext}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition"
+                >
+                  ›
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* THUMBNAIL CAROUSEL (25% of screen) */}
+          {media.length > 1 && (
+            <div className="h-[25vh] bg-black/50 p-3">
+              <div
+                ref={thumbnailScrollRef}
+                className="flex gap-3 h-full overflow-x-auto no-scrollbar items-center"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {media.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setFullscreenIndex(idx)}
+                    className={`h-[80%] w-auto flex-shrink-0 rounded-lg overflow-hidden transition-all duration-200 ${
+                      idx === fullscreenIndex
+                        ? "ring-2 ring-[#D4AF37] scale-105"
+                        : "ring-1 ring-white/20 hover:ring-white/50"
+                    }`}
+                  >
+                    {item.type === "image" ? (
+                      <img
+                        src={item.src}
+                        className="h-full w-auto object-cover"
+                        alt={`Thumbnail ${idx + 1}`}
+                      />
+                    ) : (
+                      <div className="h-full w-24 bg-gray-700 flex items-center justify-center text-white/60 text-xs">
+                        ▶ Video
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 🔥 FULL NAME MODAL/POPUP */}
       {showFullNameModal && (
@@ -259,8 +398,10 @@ export default function ListingPage() {
 
           <div className="space-y-4">
 
-            <div className="relative w-full h-[380px] bg-gray-100 rounded-2xl overflow-hidden">
-
+            <div
+              className="relative w-full h-[380px] bg-gray-100 rounded-2xl overflow-hidden cursor-pointer"
+              onClick={() => openFullscreen(currentIndex)}
+            >
               {media.length > 0 ? (
                 <>
                   {media[currentIndex].type === "image" ? (
@@ -273,27 +414,35 @@ export default function ListingPage() {
                       src={media[currentIndex].src}
                       className="w-full h-full object-cover"
                       controls
+                      onClick={(e) => e.stopPropagation()}
                     />
                   )}
+
+                  {/* 🔥 FULLSCREEN HINT */}
+                  <div className="absolute bottom-2 right-2 bg-black/50 text-white/70 text-xs px-2 py-1 rounded-full">
+                    ⛶
+                  </div>
 
                   {media.length > 1 && (
                     <>
                       <button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setCurrentIndex((prev) =>
                             prev === 0 ? media.length - 1 : prev - 1
-                          )
-                        }
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full"
+                          );
+                        }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full hover:bg-black/60 transition"
                       >
                         ‹
                       </button>
 
                       <button
-                        onClick={() =>
-                          setCurrentIndex((prev) => (prev + 1) % media.length)
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentIndex((prev) => (prev + 1) % media.length);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white px-3 py-2 rounded-full hover:bg-black/60 transition"
                       >
                         ›
                       </button>
@@ -313,9 +462,10 @@ export default function ListingPage() {
                 {media.map((_, i) => (
                   <div
                     key={i}
-                    className={`w-2 h-2 rounded-full ${
+                    className={`w-2 h-2 rounded-full cursor-pointer ${
                       i === currentIndex ? "bg-emerald-700" : "bg-gray-300"
                     }`}
+                    onClick={() => setCurrentIndex(i)}
                   />
                 ))}
               </div>
