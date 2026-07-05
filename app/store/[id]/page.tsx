@@ -111,8 +111,6 @@ export default function MerchantStorefrontPage() {
 
             <span>📍 {merchant.location}</span>
 
-            <span>☎ {merchant.contact_phone}</span>
-
             {merchant.email && (
               <span>✉ {merchant.email}</span>
             )}
