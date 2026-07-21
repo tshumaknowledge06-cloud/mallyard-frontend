@@ -7,9 +7,9 @@ const PILOT_MODE = true;
 
 // 🔥 FRONTEND CONFIG
 const PILOT_CONFIG = {
-  title: "Pilot Mode Active",
+  title: "Pilot Mode • Building The Future",
   message:
-    "You’re experiencing early access to The Mallyard. Features may evolve as we refine the platform.",
+    "You're experiencing early access to The Mallyard while we refine the platform. Our mobile app is on the way, bringing an even faster marketplace experience. Thank you for helping shape what's next.",
 };
 
 export default function PilotBanner() {
