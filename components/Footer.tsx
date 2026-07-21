@@ -81,7 +81,7 @@ export default function Footer() {
 
             <li>
               <a
-                href="https://facebook.com/themallyard"
+                href="https://www.facebook.com/share/14k3EJE5G97/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition"
@@ -105,7 +105,7 @@ export default function Footer() {
 
             <li>
               <a
-                href="https://linkedin.com/company/themallyard"
+                href="https://www.linkedin.com/in/knowledge-tshuma-92510a372?utm_source=share_via&utm_content=profile&utm_medium=member_android"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition"
@@ -117,7 +117,7 @@ export default function Footer() {
 
             <li>
               <a
-                href="https://wa.me/263777469206"
+                href="https://whatsapp.com/channel/0029Vb7TIy6FCCoMgb1Bpi1K"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition"
