@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 🔥 NEW
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -117,6 +117,7 @@ export default function LoginPage() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("role");
     localStorage.removeItem("partner_id");
+    localStorage.removeItem("roles");
 
     try {
       const formData = new URLSearchParams();
@@ -138,27 +139,43 @@ export default function LoginPage() {
         return;
       }
 
-      const backendRole = data.role as BackendRole | undefined;
-      const actualRole = normalizeRole(backendRole);
+      // 🔥 NEW: Handle roles array from backend
+      const roles = data.roles as BackendRole[] | undefined;
 
-      if (!actualRole) {
-        setError("Login succeeded but role was not returned correctly");
+      if (!roles || roles.length === 0) {
+        setError("Login succeeded but roles were not returned correctly");
         return;
       }
 
-      if (actualRole !== routeRole) {
+      // Convert backend roles to app roles
+      const appRoles = roles.map(role => normalizeRole(role)).filter(Boolean) as AppRole[];
+
+      if (appRoles.length === 0) {
+        setError("No valid roles found for this account");
+        return;
+      }
+
+      // Store all roles
+      localStorage.setItem("roles", JSON.stringify(appRoles));
+
+      // Check if the user has the required role for this portal
+      if (!appRoles.includes(routeRole)) {
         setError(getRoleMismatchMessage(routeRole));
         return;
       }
 
+      // Store the access token
       localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("role", actualRole);
 
-      if (actualRole === "delivery_partner" && data.partner_id) {
+      // Store the selected role (the one they logged in with)
+      localStorage.setItem("role", routeRole);
+
+      // Store partner ID if delivery partner
+      if (routeRole === "delivery_partner" && data.partner_id) {
         localStorage.setItem("partner_id", String(data.partner_id));
       }
 
-      redirectByRole(actualRole);
+      redirectByRole(routeRole);
     } catch (err) {
       console.error("Login error:", err);
       setError("Unable to connect to server");
@@ -190,7 +207,6 @@ export default function LoginPage() {
           required
         />
 
-        {/* 🔥 PASSWORD FIELD WITH EYE TOGGLE */}
         <div className="relative w-full mb-4">
           <input
             type={showPassword ? "text" : "password"}

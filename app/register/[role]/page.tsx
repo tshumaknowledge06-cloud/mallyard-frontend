@@ -60,7 +60,7 @@ export default function RegisterPage() {
     }
   }, [role]);
 
-  // ACCOUNT REGISTER (ONLY CUSTOMER / SELLER)
+  // ACCOUNT REGISTER (CUSTOMER / SELLER)
   async function handleAccountRegister(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -76,10 +76,9 @@ export default function RegisterPage() {
           password,
           full_name: fullName,
           role,
-          // 🔥 NEW CUSTOMER FIELDS
-          phone_number: role === "customer" ? phoneNumber : null,
-          default_address: role === "customer" ? defaultAddress : null,
-          city_name: role === "customer" ? cityName : null,
+          phone_number: phoneNumber || undefined,
+          default_address: defaultAddress || undefined,
+          city_name: cityName || undefined,
         })
       });
 
@@ -95,6 +94,7 @@ export default function RegisterPage() {
       }
 
       if (role === "seller") {
+        // ✅ Use the user ID from the register response
         setUserId(data.id);
         setStep("merchant");
         setLoading(false);
@@ -157,18 +157,18 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const data = await fetchPublic(`/merchants/register?user_id=${userId}`, {
+      const data = await fetchPublic("/merchants/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          user_id: userId,
           business_name: businessName,
           description,
           merchant_type: merchantType,
           location,
           contact_phone: contactPhone,
-          // 🔥 NEW MERCHANT FIELDS
           pickup_address: pickupAddress,
           city_name: merchantCity,
           payment_methods: [],
@@ -281,7 +281,7 @@ export default function RegisterPage() {
         </form>
       )}
 
-      {/* ✅ MERCHANT FORM (FIXED MISSING STEP) */}
+      {/* ✅ MERCHANT FORM */}
       {step === "merchant" && (
         <form
           onSubmit={handleMerchantSubmit}
@@ -434,7 +434,7 @@ export default function RegisterPage() {
               <br /><br />
               Your business is now on the path to reaching a wider, trusted marketplace.
               <br /><br />
-              Once approved, you will be notified via your registered contact details, and you’ll gain full access to your merchant dashboard to start selling, growing, and scaling your business.
+              Once approved, you will be notified via your registered contact details, and you'll gain full access to your merchant dashboard to start selling, growing, and scaling your business.
             </p>
 
             <button

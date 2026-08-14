@@ -78,7 +78,7 @@ export default function AboutPage() {
         </h2>
 
         <p className="text-gray-600 leading-relaxed">
-          The Mallyard was founded by two Zimbabwean students —
+          The Mallyard was founded by two students —
           Knowledge Tshuma and Mayibongwe Nigel Sidile, —
           driven by a shared understanding of the gaps within everyday commerce.
         </p>
