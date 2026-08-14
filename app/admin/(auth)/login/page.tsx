@@ -34,7 +34,7 @@ export default function LoginPage() {
     }
 
     if (Array.isArray(data.detail)) {
-      return data.map((item: any) => item.msg || "Login failed").join(", ");
+      return data.detail.map((item: any) => item.msg || "Login failed").join(", ");
     }
 
     return "Login failed";
@@ -48,6 +48,7 @@ export default function LoginPage() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("role");
     localStorage.removeItem("partner_id");
+    localStorage.removeItem("roles");
 
     try {
       const response = await fetch(
@@ -71,14 +72,30 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.role !== "admin") {
+      // 🔥 NEW: Handle roles array from backend
+      const roles = data.roles as string[] | undefined;
+
+      if (!roles || roles.length === 0) {
+        setError("Login succeeded but roles were not returned correctly");
+        return;
+      }
+
+      // Check if admin role exists
+      if (!roles.includes("admin")) {
         setError("Only admins can log in here.");
         return;
       }
 
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("role", data.role);
+      // Store roles
+      localStorage.setItem("roles", JSON.stringify(roles));
 
+      // Store access token
+      localStorage.setItem("access_token", data.access_token);
+
+      // Store the selected role (admin)
+      localStorage.setItem("role", "admin");
+
+      // Store partner ID if present
       if (data.partner_id) {
         localStorage.setItem("partner_id", String(data.partner_id));
       }
