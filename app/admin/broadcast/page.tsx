@@ -76,7 +76,7 @@ export default function AdminBroadcastPage() {
 
     try {
       const response =
-        await fetchWithAuth("/admin/broadcast", {
+        await fetchWithAuth("/api/admin/broadcast", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
