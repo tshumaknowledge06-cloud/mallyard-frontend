@@ -18,6 +18,7 @@ export default function AdminSidebar({
     { href: "/admin/route_management", label: "🚚 Route Management" },
     { href: "/admin/deliveries", label: "📦 Deliveries" },
     { href: "/admin/analytics", label: "📈 Analytics" },
+    { href: "/admin/broadcast", label: "📣 Broadcasts" },
  ];
 
   return (
