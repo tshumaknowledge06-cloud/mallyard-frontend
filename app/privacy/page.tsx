@@ -125,14 +125,25 @@ export default function PrivacyPage() {
         <h2 className="mt-6 mb-2 font-semibold text-gray-900">
           7. Your Rights
         </h2>
+
         <p className="mb-3">
           Depending on your jurisdiction, you may:
         </p>
+
         <ul className="list-disc pl-5 space-y-1">
           <li>Request access to your personal data</li>
           <li>Request correction or deletion</li>
           <li>Withdraw consent where applicable</li>
         </ul>
+
+        <div className="mt-4">
+          <a
+            href="/delete-account"
+            className="inline-flex items-center rounded-lg bg-[#046D56] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#035543]"
+          >
+            Request to Delete Your Account
+          </a>
+        </div>
       </section>
 
       {/* 8 */}
@@ -179,7 +190,7 @@ export default function PrivacyPage() {
             We do not guarantee outcomes, pricing, or service quality
           </li>
           <li>
-            All engagements occur at the user’s discretion and responsibility
+            All engagements occur at the user's discretion and responsibility
           </li>
         </ul>
 
