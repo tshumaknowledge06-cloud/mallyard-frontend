@@ -65,6 +65,22 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
 
+    // 🔥 Clean full_name: collapse multiple spaces
+    const cleanedName = fullName.trim().replace(/\s+/g, " ");
+    const cleanedPassword = password.trim();
+
+    if (cleanedName.length < 2 || cleanedName.length > 100) {
+      alert("Full name must be between 2 and 100 characters.");
+      setLoading(false);
+      return;
+    }
+
+    if (cleanedPassword.length < 5 || cleanedPassword.length > 128) {
+      alert("Password must be between 5 and 128 characters.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await fetchPublic("/auth/register", {
         method: "POST",
@@ -72,13 +88,13 @@ export default function RegisterPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          email,
-          password,
-          full_name: fullName,
+          email: email.trim(),
+          password: cleanedPassword,
+          full_name: cleanedName,
           role,
-          phone_number: phoneNumber || undefined,
-          default_address: defaultAddress || undefined,
-          city_name: cityName || undefined,
+          phone_number: phoneNumber?.trim() || undefined,
+          default_address: defaultAddress?.trim() || undefined,
+          city_name: cityName?.trim() || undefined,
         })
       });
 
@@ -113,6 +129,21 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
 
+    const cleanedName = fullName.trim().replace(/\s+/g, " ");
+    const cleanedPassword = password.trim();
+
+    if (cleanedName.length < 2 || cleanedName.length > 100) {
+      alert("Full name must be between 2 and 100 characters.");
+      setLoading(false);
+      return;
+    }
+
+    if (cleanedPassword.length < 5 || cleanedPassword.length > 128) {
+      alert("Password must be between 5 and 128 characters.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await fetchPublic("/delivery/register", {
         method: "POST",
@@ -120,13 +151,13 @@ export default function RegisterPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          full_name: fullName,
-          phone_number: phone,
-          email,
-          password,
-          vehicle_type: vehicleType,
-          license_number: licenseNumber,
-          operating_city: operatingCity
+          full_name: cleanedName,
+          phone_number: phone.trim(),
+          email: email.trim(),
+          password: cleanedPassword,
+          vehicle_type: vehicleType.trim(),
+          license_number: licenseNumber?.trim() || undefined,
+          operating_city: operatingCity.trim()
         })
       });
 
@@ -164,13 +195,13 @@ export default function RegisterPage() {
         },
         body: JSON.stringify({
           user_id: userId,
-          business_name: businessName,
-          description,
+          business_name: businessName.trim(),
+          description: description.trim(),
           merchant_type: merchantType,
-          location,
-          contact_phone: contactPhone,
-          pickup_address: pickupAddress,
-          city_name: merchantCity,
+          location: location.trim(),
+          contact_phone: contactPhone.trim(),
+          pickup_address: pickupAddress?.trim() || undefined,
+          city_name: merchantCity?.trim() || undefined,
           payment_methods: [],
         }),
       });
