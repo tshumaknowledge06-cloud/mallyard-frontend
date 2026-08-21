@@ -184,18 +184,22 @@ export default function RegisterPage() {
     }
 
     // 🔥 Validate required fields
-    if (!businessName.trim()) {
+    const trimmedBusinessName = businessName.trim();
+    const trimmedContactPhone = contactPhone.trim();
+    const trimmedMerchantCity = merchantCity.trim();
+
+    if (!trimmedBusinessName) {
       alert("Business name is required.");
       return;
     }
 
-    if (!merchantCity.trim()) {
-      alert("City is required.");
+    if (!trimmedContactPhone) {
+      alert("Contact phone is required.");
       return;
     }
 
-    if (!contactPhone.trim()) {
-      alert("Contact phone is required.");
+    if (!trimmedMerchantCity) {
+      alert("City is required.");
       return;
     }
 
@@ -209,14 +213,14 @@ export default function RegisterPage() {
         },
         body: JSON.stringify({
           user_id: userId,
-          business_name: businessName.trim(),
-          description: description?.trim() || undefined,
+          business_name: trimmedBusinessName,
+          description: description?.trim() || "",
           merchant_type: merchantType,
-          location: location?.trim() || undefined,
-          contact_phone: contactPhone.trim(),
+          location: location?.trim() || "",
+          contact_phone: trimmedContactPhone,
           payment_methods: [],
-          pickup_address: pickupAddress?.trim() || undefined,
-          city_name: merchantCity.trim(), // ✅ REQUIRED - always send
+          pickup_address: pickupAddress?.trim() || "",
+          city_name: trimmedMerchantCity, // ✅ REQUIRED - always send with value
         }),
       });
 
@@ -230,6 +234,7 @@ export default function RegisterPage() {
       setShowMerchantPopup(true);
 
     } catch (err: any) {
+      console.error("Merchant registration error:", err);
       alert(err?.message || "Network error");
     }
 
@@ -333,6 +338,10 @@ export default function RegisterPage() {
           <h2 className="text-xl font-semibold mb-4 text-emerald-800">
             Complete Your Business Profile 🏪
           </h2>
+
+          <p className="text-sm text-gray-500 mb-4">
+            Fields marked with * are required.
+          </p>
 
           <input
             placeholder="Business Name *"
