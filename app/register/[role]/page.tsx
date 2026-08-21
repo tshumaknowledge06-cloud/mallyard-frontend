@@ -183,6 +183,22 @@ export default function RegisterPage() {
       return;
     }
 
+    // 🔥 Validate required fields
+    if (!businessName.trim()) {
+      alert("Business name is required.");
+      return;
+    }
+
+    if (!merchantCity.trim()) {
+      alert("City is required.");
+      return;
+    }
+
+    if (!contactPhone.trim()) {
+      alert("Contact phone is required.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -194,13 +210,13 @@ export default function RegisterPage() {
         body: JSON.stringify({
           user_id: userId,
           business_name: businessName.trim(),
-          description: description.trim(),
+          description: description?.trim() || undefined,
           merchant_type: merchantType,
-          location: location.trim(),
+          location: location?.trim() || undefined,
           contact_phone: contactPhone.trim(),
-          pickup_address: pickupAddress?.trim() || undefined,
-          city_name: merchantCity?.trim() || undefined,
           payment_methods: [],
+          pickup_address: pickupAddress?.trim() || undefined,
+          city_name: merchantCity.trim(), // ✅ REQUIRED - always send
         }),
       });
 
@@ -319,42 +335,45 @@ export default function RegisterPage() {
           </h2>
 
           <input
-            placeholder="Business Name"
+            placeholder="Business Name *"
             className="w-full mb-3 p-2 border"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
+            required
           />
 
           <input
-            placeholder="Location (city level)"
+            placeholder="Contact Phone *"
+            className="w-full mb-3 p-2 border"
+            value={contactPhone}
+            onChange={(e) => setContactPhone(e.target.value)}
+            required
+          />
+
+          <input
+            placeholder="City *"
+            className="w-full mb-3 p-2 border"
+            value={merchantCity}
+            onChange={(e) => setMerchantCity(e.target.value)}
+            required
+          />
+
+          <input
+            placeholder="Location (city level) (optional)"
             className="w-full mb-3 p-2 border"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
 
           <input
-            placeholder="Contact Phone"
-            className="w-full mb-3 p-2 border"
-            value={contactPhone}
-            onChange={(e) => setContactPhone(e.target.value)}
-          />
-
-          <input
-            placeholder="Parcel Pickup Default Address"
+            placeholder="Parcel Pickup Default Address (optional)"
             className="w-full mb-3 p-2 border"
             value={pickupAddress}
             onChange={(e) => setPickupAddress(e.target.value)}
           />
 
-          <input
-            placeholder="City"
-            className="w-full mb-3 p-2 border"
-            value={merchantCity}
-            onChange={(e) => setMerchantCity(e.target.value)}
-          />
-
           <textarea
-            placeholder="Business Description"
+            placeholder="Business Description (optional)"
             className="w-full mb-4 p-2 border"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
