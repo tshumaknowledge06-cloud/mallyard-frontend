@@ -206,13 +206,13 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const data = await fetchPublic("/merchants/register", {
+      // 🔥 FIX: Pass user_id as query parameter, not in body
+      const data = await fetchPublic(`/merchants/register?user_id=${userId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_id: userId,
           business_name: trimmedBusinessName,
           description: description?.trim() || "",
           merchant_type: merchantType,
