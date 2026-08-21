@@ -30,7 +30,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // 🔥 NEW CUSTOMER FIELDS
+  // 🔥 CUSTOMER FIELDS (ALSO USED FOR MERCHANT)
   const [phoneNumber, setPhoneNumber] = useState("");
   const [defaultAddress, setDefaultAddress] = useState("");
   const [cityName, setCityName] = useState("");
@@ -42,14 +42,12 @@ export default function RegisterPage() {
   const [operatingCity, setOperatingCity] = useState("");
   const [showDeliveryPassword, setShowDeliveryPassword] = useState(false);
 
-  // MERCHANT
+  // MERCHANT PROFILE (STEP 2)
   const [businessName, setBusinessName] = useState("");
   const [description, setDescription] = useState("");
   const [merchantType, setMerchantType] = useState("seller");
   const [location, setLocation] = useState("");
   const [contactPhone, setContactPhone] = useState("");
-  
-  // 🔥 NEW MERCHANT FIELDS
   const [pickupAddress, setPickupAddress] = useState("");
   const [merchantCity, setMerchantCity] = useState("");
 
@@ -276,34 +274,32 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* 🔥 NEW CUSTOMER FIELDS (only for customers) */}
-          {role === "customer" && (
-            <>
-              <input
-                type="text"
-                placeholder="Phone Number"
-                className="w-full mb-4 px-4 py-2 border rounded"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
+          {/* 🔥 PHONE NUMBER - SHOWN FOR BOTH CUSTOMER AND SELLER */}
+          <input
+            type="text"
+            placeholder="Phone Number"
+            className="w-full mb-4 px-4 py-2 border rounded"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
 
-              <input
-                type="text"
-                placeholder="Default Address"
-                className="w-full mb-4 px-4 py-2 border rounded"
-                value={defaultAddress}
-                onChange={(e) => setDefaultAddress(e.target.value)}
-              />
+          {/* 🔥 DEFAULT ADDRESS - SHOWN FOR BOTH CUSTOMER AND SELLER */}
+          <input
+            type="text"
+            placeholder="Default Address"
+            className="w-full mb-4 px-4 py-2 border rounded"
+            value={defaultAddress}
+            onChange={(e) => setDefaultAddress(e.target.value)}
+          />
 
-              <input
-                type="text"
-                placeholder="City"
-                className="w-full mb-4 px-4 py-2 border rounded"
-                value={cityName}
-                onChange={(e) => setCityName(e.target.value)}
-              />
-            </>
-          )}
+          {/* 🔥 CITY - SHOWN FOR BOTH CUSTOMER AND SELLER */}
+          <input
+            type="text"
+            placeholder="City"
+            className="w-full mb-4 px-4 py-2 border rounded"
+            value={cityName}
+            onChange={(e) => setCityName(e.target.value)}
+          />
 
           <button className="w-full bg-emerald-700 text-white py-2 rounded">
             {loading ? "Registering..." : "Continue"}
@@ -312,7 +308,7 @@ export default function RegisterPage() {
         </form>
       )}
 
-      {/* ✅ MERCHANT FORM */}
+      {/* ✅ MERCHANT FORM (STEP 2) */}
       {step === "merchant" && (
         <form
           onSubmit={handleMerchantSubmit}
@@ -330,7 +326,7 @@ export default function RegisterPage() {
           />
 
           <input
-            placeholder="Location(city level)"
+            placeholder="Location (city level)"
             className="w-full mb-3 p-2 border"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
@@ -343,7 +339,6 @@ export default function RegisterPage() {
             onChange={(e) => setContactPhone(e.target.value)}
           />
 
-          {/* 🔥 NEW MERCHANT FIELDS */}
           <input
             placeholder="Parcel Pickup Default Address"
             className="w-full mb-3 p-2 border"
