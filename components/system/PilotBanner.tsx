@@ -7,9 +7,11 @@ const PILOT_MODE = true;
 
 // 🔥 FRONTEND CONFIG
 const PILOT_CONFIG = {
-  title: "Pilot Mode • Building The Future",
+  title: "The Mallyard App Is Live",
   message:
-    "Our mobile app is on the way, bringing an even faster marketplace experience. Thank you for helping shape what's next.",
+    "The Yard is now on Android. Discover, compare, and connect wherever you are.",
+  appUrl:
+    "https://play.google.com/store/apps/details?id=com.themallyard.mobile&pcampaignid=web_share",
 };
 
 export default function PilotBanner() {
@@ -49,22 +51,65 @@ export default function PilotBanner() {
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
+          gap: "8px",
+          flexWrap: "wrap",
+          paddingRight: "28px",
         }}
       >
         {/* 🔥 PREMIUM MESSAGE */}
+
         <p
           style={{
             textAlign: "center",
             fontWeight: 500,
             letterSpacing: "0.025em",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            flexWrap: "wrap",
+            justifyContent: "center",
           }}
         >
-          <span style={{ marginRight: "4px" }}>🚀</span>
-          <span style={{ fontWeight: 600 }}>{PILOT_CONFIG.title}:</span>{" "}
+          <span style={{ fontSize: "clamp(14px, 2vw, 18px)" }}>🚀</span>
+          <span style={{ fontWeight: 600, color: "#fcd34d" }}>
+            {PILOT_CONFIG.title}:
+          </span>
           <span style={{ opacity: 0.9 }}>{PILOT_CONFIG.message}</span>
         </p>
 
+        {/* 🔥 GET APP BUTTON */}
+
+        <a
+          href={PILOT_CONFIG.appUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            backgroundColor: "#fcd34d",
+            color: "#064e3b",
+            fontWeight: 600,
+            fontSize: "clamp(11px, 1.5vw, 13px)",
+            padding: "4px 14px",
+            borderRadius: "9999px",
+            textDecoration: "none",
+            transition: "all 0.2s",
+            whiteSpace: "nowrap",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#fbbf24";
+            e.currentTarget.style.transform = "scale(1.02)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#fcd34d";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          Get App
+        </a>
+
         {/* 🔥 CLOSE BUTTON */}
+
         <button
           onClick={() => {
             setVisible(false);
@@ -73,12 +118,15 @@ export default function PilotBanner() {
           style={{
             position: "absolute",
             right: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
             background: "transparent",
             border: "none",
             color: "rgba(255, 255, 255, 0.6)",
             cursor: "pointer",
             fontSize: "14px",
             transition: "color 0.2s",
+            padding: "4px",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")}
