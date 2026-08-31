@@ -108,18 +108,6 @@ export default function ResetPasswordPage() {
     }
   }
 
-  function openAppLogin() {
-    const appUrl = "mallyard://login";
-
-    window.location.href = appUrl;
-
-    // Fallback: if the app isn't installed/openable, give the user
-    // a moment before taking them back to the website.
-    window.setTimeout(() => {
-      window.location.href = "/login";
-    }, 1800);
-  }
-
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F8F7F2] px-6 py-12">
       <div className="w-full max-w-md">
