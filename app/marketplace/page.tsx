@@ -6,6 +6,7 @@ import { Store, Package, Zap, Eye } from "lucide-react";
 
 import ListingCard from "@/components/marketplace/ListingCard";
 import CategoryFilter from "@/components/marketplace/CategoryFilter";
+import { Suspense } from "react";
 
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyState from "@/components/ui/EmptyState";
@@ -48,7 +49,7 @@ interface FeaturedMerchant {
 
 /* ================= PAGE ================= */
 
-export default function MarketplacePage() {
+function MarketplacePageContent() {
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [trending, setTrending] = useState<Listing[]>([]);
@@ -458,6 +459,22 @@ export default function MarketplacePage() {
       )}
 
     </div>
+  );
+}
+
+/* ================= DEFAULT EXPORT (SUSPENSE WRAPPER) ================= */
+
+export default function MarketplacePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
+          <LoadingState />
+        </div>
+      }
+    >
+      <MarketplacePageContent />
+    </Suspense>
   );
 }
 
