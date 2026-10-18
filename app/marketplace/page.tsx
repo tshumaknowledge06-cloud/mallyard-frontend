@@ -11,6 +11,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import EmptyState from "@/components/ui/EmptyState";
 import { fetchPublic, fetchWithAuth } from "@/lib/api";
 import { getMediaUrl } from "@/lib/getMediaUrl";
+import { useSearchParams } from "next/navigation";
 
 /* ================= TYPES ================= */
 
@@ -56,7 +57,9 @@ export default function MarketplacePage() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   
   // 🔥 Product/Service filter state - default to "service"
-  const [listingTypeFilter, setListingTypeFilter] = useState<"product" | "service">("service");
+  const searchParams = useSearchParams();
+  const initialType = searchParams.get("type") as "product" | "service" | null;
+  const [listingTypeFilter, setListingTypeFilter] = useState<"product" | "service">(initialType || "service");
   
   // 🔥 Featured Merchants state
   const [featuredMerchants, setFeaturedMerchants] = useState<FeaturedMerchant[]>([]);

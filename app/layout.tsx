@@ -38,7 +38,7 @@ export default function RootLayout({
         <DashboardQuickAccess />
 
         {/* Main Content */}
-        <main className="flex-1 container-page">
+        <main className="flex-1 w-full">
           {children}
         </main>
 

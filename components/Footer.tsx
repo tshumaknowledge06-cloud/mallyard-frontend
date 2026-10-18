@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="bg-emerald-900 text-gray-300 mt-20 border-t border-emerald-800">
 
       {/* MAIN FOOTER */}
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-5 gap-10 text-sm">
+      <div className="container-page py-12 grid grid-cols-1 md:grid-cols-5 gap-10 text-sm">
 
         {/* BRAND STORY */}
         <div className="md:col-span-2">
@@ -135,7 +135,7 @@ export default function Footer() {
 
       {/* BOTTOM BAR */}
       <div className="border-t border-emerald-800">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+        <div className="container-page py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
 
           <p className="text-center md:text-left">
             © {new Date().getFullYear()} The Mallyard. All rights reserved.
