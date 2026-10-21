@@ -55,9 +55,17 @@ export default function ProductShowcase() {
         const data = await res.json();
         const all = Array.isArray(data) ? data : [];
 
-        const realProducts = all
-          .filter((l: Listing) => l.listing_type === "product")
-          .slice(0, MAX_REAL_PRODUCTS);
+        /* ================= RANDOM SHUFFLE ON EACH LOAD ================= */
+
+        const allProducts = all.filter(
+          (l: Listing) => l.listing_type === "product"
+        );
+
+        const realProducts = allProducts
+          .map((p: Listing) => ({ p, r: Math.random() }))
+          .sort((a, b) => a.r - b.r)
+          .slice(0, MAX_REAL_PRODUCTS)
+          .map(({ p }) => p);
 
         if (!cancelled) {
           setProducts(realProducts);
